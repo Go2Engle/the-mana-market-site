@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mana Market - Premium MTG Accessories</title>
+    <meta name="description" content="Discover premium Magic: The Gathering accessories at The Mana Market. Featuring high-quality playmats, deck boxes, and more for MTG enthusiasts.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-light': '#4F46E5',
+                        'primary-dark': '#818CF8'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        .mobile-menu-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .mobile-menu-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 100ms ease-out, transform 100ms ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm z-50 transition-colors duration-200">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-primary-light dark:text-primary-dark">The Mana Market</div>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Home</a>
+                <a href="products.html" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Products</a>
+                <a href="#testimonials" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Reviews</a>
+                <a href="#about" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">About</a>
+                <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-theme-toggle" class="mr-4 text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+                <button id="mobile-menu-button" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-gray-800 transition-colors duration-200">
+            <div class="container mx-auto px-4 py-4 space-y-4">
+                <a href="index.html" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Home</a>
+                <a href="products.html" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Products</a>
+                <a href="#testimonials" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Reviews</a>
+                <a href="#about" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 bg-black/50 z-10"></div>
+            
+            <!-- Hero Image -->
+            <div id="hero-carousel" class="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-500"></div>
+
+            <!-- Navigation Buttons -->
+            <button id="prev-slide" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 text-white hover:text-primary-light transition-colors">
+                <i class="fas fa-chevron-left text-3xl"></i>
+            </button>
+            <button id="next-slide" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 text-white hover:text-primary-light transition-colors">
+                <i class="fas fa-chevron-right text-3xl"></i>
+            </button>
+
+            <!-- Content -->
+            <div class="relative container mx-auto px-4 text-center text-white z-20">
+                <div id="hero-content" class="max-w-3xl mx-auto">
+                    <h1 id="hero-title" class="text-4xl md:text-5xl font-bold mb-4"></h1>
+                    <p id="hero-description" class="text-lg md:text-xl mb-6"></p>
+                    <a id="hero-link" href="#" target="_blank" rel="noopener noreferrer" 
+                    class="inline-block bg-primary-light hover:bg-primary-dark text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                        Shop Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products Section -->
+        <section id="featured" class="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white text-center">Featured Products</h2>
+                <p class="text-gray-600 dark:text-gray-400 text-center mb-12">Discover our most popular items</p>
+                
+                <!-- Featured Items Grid -->
+                <div id="featured-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- Items will be populated by JavaScript -->
+                </div>
+                
+                <!-- View All Products Button -->
+                <div class="text-center">
+                    <a href="products.html" class="inline-block px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
+                        View All Products
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 bg-white dark:bg-gray-800 transition-colors duration-200">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-gray-900 dark:text-white">About The Mana Market</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                        Welcome to The Mana Market, your premier destination for high-quality Magic: The Gathering accessories. 
+                        We specialize in creating unique, durable products that enhance your gaming experience.
+                    </p>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">
+                        From custom playmats to deck boxes, each item is crafted with care and attention to detail. 
+                        Our products are designed by MTG enthusiasts, for MTG enthusiasts.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section id="testimonials" class="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">What Our Customers Say</h2>
+                
+                <div class="relative max-w-7xl mx-auto">
+                    <!-- Reviews track with gradient masks -->
+                    <div class="relative">
+                        <!-- Left fade gradient -->
+                        <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-900 z-[1]"></div>
+                        
+                        <!-- Right fade gradient -->
+                        <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 z-[1]"></div>
+                        
+                        <!-- Scrolling container -->
+                        <div class="overflow-hidden">
+                            <div id="reviews-container" class="flex gap-6 transition-transform duration-500 ease-out px-4">
+                                <!-- Reviews will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 py-8 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="text-center text-gray-600 dark:text-gray-400">
+                <p>&copy; 2024 The Mana Market. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts.js?v=1.0.0"></script>
+</body>
+</html>
