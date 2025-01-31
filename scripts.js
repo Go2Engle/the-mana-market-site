@@ -365,7 +365,7 @@ async function fetchEtsyListings() {
         };
 
         const rows = parseCSV(text);
-        const headers = rows[0];
+        const headers = rows[0].map(header => header.trim()); // Make sure to trim headers
         const data = rows.slice(1);
 
         // Convert to array of objects
@@ -405,7 +405,7 @@ async function updateHeroSection() {
                     title: title,
                     description: description,
                     image: product.IMAGE1,
-                    link: `https://www.etsy.com/shop/themanamarket/search?search_query=${encodeURIComponent(title)}`
+                    link: getEtsySearchUrl(product) // This will now use the direct URL from CSV
                 });
             });
 
@@ -423,10 +423,17 @@ function truncateText(text, maxLength) {
     return text.substring(0, maxLength).trim() + '...';
 }
 
-// Function to get Etsy shop search URL
+// Function to get Etsy URL
 function getEtsySearchUrl(item) {
-    const searchTitle = encodeURIComponent(item.TITLE.replace('The Mana Market: ', ''));
-    return `https://www.etsy.com/shop/TheManaMarket/search?search_query=${searchTitle}`;
+    // If we have a direct URL in the CSV, use it
+    if (item.url || item.URL) {
+        return item.url || item.URL;
+    }
+    
+    // Fallback to shop search if no direct URL is available
+    const title = (item.title || item.TITLE || '').replace(/The\s+Mana\s+Market:?\s*/i, '');
+    const searchTitle = encodeURIComponent(title);
+    return `https://www.etsy.com/shop/themanamarket/search?search_query=${searchTitle}&utm_source=manamarket&utm_medium=shop_link&utm_campaign=share`;
 }
 
 // Function to update featured items
@@ -453,7 +460,7 @@ async function updateFeaturedItems() {
                         <a href="${detailsUrl}" class="block">
                             <img src="${item.IMAGE1}" alt="${title}" class="w-full h-64 object-cover">
                             <div class="p-6 flex-1">
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">${title}</h3>
+                                <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">${title}</h3>
                                 <p class="text-gray-600 dark:text-gray-400 mb-4">${description}</p>
                             </div>
                         </a>
@@ -493,7 +500,7 @@ function renderProducts() {
                     <a href="${detailsUrl}" class="block">
                         <img src="${item.IMAGE1}" alt="${title}" class="w-full h-64 object-cover">
                         <div class="p-6 flex-1">
-                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">${title}</h3>
+                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">${title}</h3>
                             <p class="text-gray-600 dark:text-gray-400 mb-4">${description}</p>
                         </div>
                     </a>
