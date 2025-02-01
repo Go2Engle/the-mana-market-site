@@ -130,29 +130,79 @@ function populateTestimonials() {
     const cardWidth = 288 + gap; // w-72 (288px) + gap
     const totalWidth = cardWidth * reviews.length;
 
+    let isMouseDown = false;
+    let startX;
+    let scrollLeft;
+    let animationFrameId;
+    let isPaused = false;
+
     function animate() {
-        scrollPosition += speed;
-        
-        // Reset position when we've scrolled through one set of reviews
-        if (scrollPosition >= totalWidth) {
-            scrollPosition = 0;
+        if (!isPaused) {
+            scrollPosition += speed;
+            
+            // Reset position when we've scrolled through one set of reviews
+            if (scrollPosition >= totalWidth) {
+                scrollPosition = 0;
+            }
+            
+            scrollWrapper.style.transform = `translateX(${-scrollPosition}px)`;
         }
-        
-        scrollWrapper.style.transform = `translateX(${-scrollPosition}px)`;
-        requestAnimationFrame(animate);
+        animationFrameId = requestAnimationFrame(animate);
     }
 
     // Start animation
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
 
-    // Pause on hover
-    container.addEventListener('mouseenter', () => {
-        scrollWrapper.style.animationPlayState = 'paused';
-    });
-    
-    container.addEventListener('mouseleave', () => {
-        scrollWrapper.style.animationPlayState = 'running';
-    });
+    // Mouse and touch event handlers
+    function handleDragStart(e) {
+        isPaused = true;
+        isMouseDown = true;
+        startX = (e.pageX || e.touches[0].pageX) - container.offsetLeft;
+        scrollLeft = scrollPosition;
+        
+        // Change cursor style
+        scrollWrapper.style.cursor = 'grabbing';
+    }
+
+    function handleDragEnd() {
+        isMouseDown = false;
+        isPaused = false;
+        
+        // Restore cursor style
+        scrollWrapper.style.cursor = 'grab';
+    }
+
+    function handleDragMove(e) {
+        if (!isMouseDown) return;
+        e.preventDefault();
+        
+        const x = (e.pageX || e.touches[0].pageX) - container.offsetLeft;
+        const walk = (x - startX) * 1.5; // Multiply by 1.5 to make scrolling more responsive
+        scrollPosition = scrollLeft - walk;
+        
+        // Ensure scrollPosition stays within bounds
+        if (scrollPosition < 0) {
+            scrollPosition = totalWidth + (scrollPosition % totalWidth);
+        } else if (scrollPosition >= totalWidth) {
+            scrollPosition = scrollPosition % totalWidth;
+        }
+        
+        scrollWrapper.style.transform = `translateX(${-scrollPosition}px)`;
+    }
+
+    // Add mouse event listeners
+    container.addEventListener('mousedown', handleDragStart);
+    container.addEventListener('mouseleave', handleDragEnd);
+    container.addEventListener('mouseup', handleDragEnd);
+    container.addEventListener('mousemove', handleDragMove);
+
+    // Add touch event listeners
+    container.addEventListener('touchstart', handleDragStart);
+    container.addEventListener('touchend', handleDragEnd);
+    container.addEventListener('touchmove', handleDragMove);
+
+    // Update cursor style
+    scrollWrapper.style.cursor = 'grab';
 }
 
 // Reviews carousel state
