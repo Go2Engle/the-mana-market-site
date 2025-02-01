@@ -781,13 +781,12 @@ async function displayProductDetails() {
                 <!-- Image Gallery -->
                 <div class="space-y-4">
                     <div class="aspect-w-1 aspect-h-1">
-                        <img src="${images[0]}" alt="${displayTitle}" class="w-full h-96 object-cover rounded-lg" id="main-image">
+                        <img src="${images[0]}" alt="${displayTitle}" class="w-full h-96 object-cover rounded-lg cursor-pointer product-image" id="main-image">
                     </div>
                     <div class="grid grid-cols-5 gap-2">
                         ${images.map((img, index) => `
                             <img src="${img}" alt="${displayTitle} ${index + 1}" 
-                                class="w-full h-20 object-cover rounded cursor-pointer hover:opacity-75 transition"
-                                onclick="document.getElementById('main-image').src='${img}'">
+                                class="w-full h-20 object-cover rounded cursor-pointer hover:opacity-75 transition product-image">
                         `).join('')}
                     </div>
                 </div>
@@ -840,95 +839,63 @@ async function displayProductDetails() {
         `;
 
         productDetails.innerHTML = html;
-    } catch (error) {
-        console.error('Error displaying product details:', error);
-        productDetails.innerHTML = '<p class="text-center text-gray-900 dark:text-white">Error loading product details</p>';
-    }
 
-    // Image modal functionality
-    if (document.getElementById('main-image')) {
+        // Set up image modal functionality
         const mainImage = document.getElementById('main-image');
-        const thumbnailContainer = document.getElementById('thumbnail-container');
         const imageModal = document.getElementById('image-modal');
         const modalImage = document.getElementById('modal-image');
         const closeModal = document.getElementById('close-modal');
+        const productImages = document.querySelectorAll('.product-image');
 
-        // Get product ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
-
-        if (productId) {
-            const product = listings.find(p => p.id === parseInt(productId));
-            if (product) {
-                // Update page title
-                document.title = `${product.name} - The Mana Market`;
-                
-                // Update breadcrumb
-                document.getElementById('product-name').textContent = product.name;
-                
-                // Update main product details
-                document.getElementById('product-title').textContent = product.name;
-                document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
-                document.getElementById('product-description').textContent = product.description;
-                
-                // Set main image
-                mainImage.src = product.images[0];
-                mainImage.alt = product.name;
-                
-                // Create thumbnails
-                product.images.forEach((image, index) => {
-                    const thumbnail = document.createElement('div');
-                    thumbnail.className = 'aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 cursor-pointer hover:opacity-90 transition';
-                    
-                    const img = document.createElement('img');
-                    img.src = image;
-                    img.alt = `${product.name} - View ${index + 1}`;
-                    img.className = 'w-full h-full object-cover';
-                    
-                    thumbnail.appendChild(img);
-                    thumbnailContainer.appendChild(thumbnail);
-                    
-                    // Add click event to thumbnail
-                    thumbnail.addEventListener('click', () => {
-                        mainImage.src = image;
-                        mainImage.alt = `${product.name} - View ${index + 1}`;
-                    });
-                });
-
-                // Modal functionality
-                mainImage.addEventListener('click', () => {
-                    modalImage.src = mainImage.src;
-                    modalImage.alt = mainImage.alt;
-                    imageModal.classList.remove('hidden');
-                    imageModal.classList.add('flex');
-                    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-                });
-
-                closeModal.addEventListener('click', () => {
-                    imageModal.classList.add('hidden');
-                    imageModal.classList.remove('flex');
-                    document.body.style.overflow = ''; // Restore scrolling
-                });
-
-                // Close modal when clicking outside the image
-                imageModal.addEventListener('click', (e) => {
-                    if (e.target === imageModal) {
-                        imageModal.classList.add('hidden');
-                        imageModal.classList.remove('flex');
-                        document.body.style.overflow = '';
-                    }
-                });
-
-                // Close modal with escape key
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && !imageModal.classList.contains('hidden')) {
-                        imageModal.classList.add('hidden');
-                        imageModal.classList.remove('flex');
-                        document.body.style.overflow = '';
-                    }
-                });
+        if (imageModal && modalImage && closeModal) {
+            // Function to open modal
+            function openModal(imageSrc) {
+                modalImage.src = imageSrc;
+                imageModal.classList.remove('hidden');
+                imageModal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
             }
+
+            // Function to close modal
+            function closeModalHandler() {
+                imageModal.classList.add('hidden');
+                imageModal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+
+            // Add click event only to main image for modal
+            mainImage.addEventListener('click', () => openModal(mainImage.src));
+
+            // Close modal when clicking close button
+            closeModal.addEventListener('click', closeModalHandler);
+
+            // Close modal when clicking outside the image
+            imageModal.addEventListener('click', (e) => {
+                if (e.target === imageModal) {
+                    closeModalHandler();
+                }
+            });
+
+            // Close modal with escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !imageModal.classList.contains('hidden')) {
+                    closeModalHandler();
+                }
+            });
+
+            // Set up thumbnail functionality (only updates main image)
+            const thumbnails = Array.from(productImages).filter(img => img !== mainImage);
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', () => {
+                    mainImage.src = thumbnail.src;
+                    mainImage.alt = thumbnail.alt;
+                });
+            });
         }
+
+    } catch (error) {
+        console.error('Error displaying product details:', error);
+        productDetails.innerHTML = '<p class="text-center text-gray-900 dark:text-white">Error loading product details</p>';
     }
 }
 

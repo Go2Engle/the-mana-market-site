@@ -21,7 +21,7 @@ A modern, responsive static website for The Mana Market - an Etsy shop specializ
 ## Development
 
 1. Clone the repository
-2. Open `index.html` in your browser
+2. Run 'npx http-server .' to start a local server
 3. Make changes to HTML, CSS, or JavaScript files
 4. Commit and push to deploy via GitHub Pages
 
