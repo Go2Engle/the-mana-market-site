@@ -349,10 +349,6 @@ function populateFeaturedProducts() {
                 <p class="text-gray-600 dark:text-gray-400 mb-4">${product.description}</p>
                 <div class="flex justify-between items-center">
                     <span class="text-lg font-bold text-primary-light dark:text-primary-dark">${product.price}</span>
-                    <a href="${product.link}" target="_blank" rel="noopener noreferrer" 
-                       class="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
-                        View on Etsy
-                    </a>
                 </div>
             </div>
         `;
@@ -516,10 +512,6 @@ async function updateFeaturedItems() {
                         </a>
                         <div class="p-6 pt-0 mt-auto flex justify-between items-center">
                             <span class="text-2xl font-bold text-primary-light dark:text-primary-dark">$${item.PRICE}</span>
-                            <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
-                               class="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
-                                View on Etsy
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -556,10 +548,6 @@ function renderProducts() {
                     </a>
                     <div class="p-6 pt-0 mt-auto flex justify-between items-center">
                         <span class="text-2xl font-bold text-primary-light dark:text-primary-dark">$${item.PRICE}</span>
-                        <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
-                           class="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
-                            View on Etsy
-                        </a>
                     </div>
                 </div>
             </div>
