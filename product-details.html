@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Product Name] - Premium MTG Accessory | The Mana Market</title>
-    <meta name="description" content="Get the [Product Name] at The Mana Market. High-quality Magic: The Gathering accessory perfect for any MTG player. Fast shipping and secure checkout.">
-    <meta name="keywords" content="[Product Name], MTG accessories, Magic The Gathering, MTG store">
+    <title>MTG Accessory | The Mana Market</title>
+    <meta name="description" content="Premium Magic: The Gathering accessories at The Mana Market">
+    <meta name="keywords" content="MTG accessories, Magic The Gathering">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="[Product Name] - Premium MTG Accessory">
-    <meta property="og:description" content="Get the [Product Name] at The Mana Market. High-quality Magic: The Gathering accessory perfect for any MTG player.">
+    <meta property="og:title" content="MTG Accessory | The Mana Market">
+    <meta property="og:description" content="Premium Magic: The Gathering accessories at The Mana Market">
     <meta property="og:type" content="product">
     <meta property="og:url" content="https://themanamarket.com/product-details">
     <link rel="canonical" href="https://themanamarket.com/product-details">
 
-    <!-- Structured Data -->
-    <script type="application/ld+json">
+    <!-- Structured Data Placeholder -->
+    <script type="application/ld+json" id="productSchema">
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "name": "[Product Name]",
-      "description": "High-quality Magic: The Gathering accessory perfect for any MTG player",
+      "name": "MTG Accessory",
+      "description": "Premium Magic: The Gathering accessory",
       "url": "https://themanamarket.com/product-details",
       "brand": {
         "@type": "Brand",
@@ -28,10 +28,78 @@
       "offers": {
         "@type": "Offer",
         "priceCurrency": "USD",
-        "price": "29.99",
+        "price": "0.00",
         "availability": "https://schema.org/InStock"
       }
     }
+    </script>
+
+    <!-- Script to update meta tags and structured data -->
+    <script>
+    function updateProductMetadata(product) {
+        // Update page title
+        document.title = `${product.name} - Premium MTG Accessory | The Mana Market`;
+        
+        // Update meta tags
+        document.querySelector('meta[name="description"]').setAttribute(
+            'content', 
+            `Get the ${product.name} at The Mana Market. ${product.description}. Fast shipping and secure checkout.`
+        );
+        document.querySelector('meta[name="keywords"]').setAttribute(
+            'content',
+            `${product.name}, MTG accessories, Magic The Gathering, ${product.category}`
+        );
+        
+        // Update Open Graph tags
+        document.querySelector('meta[property="og:title"]').setAttribute(
+            'content',
+            `${product.name} - Premium MTG Accessory`
+        );
+        document.querySelector('meta[property="og:description"]').setAttribute(
+            'content',
+            `Get the ${product.name} at The Mana Market. ${product.description}`
+        );
+        document.querySelector('meta[property="og:url"]').setAttribute(
+            'content',
+            `https://themanamarket.com/product-details?id=${product.id}`
+        );
+        
+        // Update canonical URL
+        document.querySelector('link[rel="canonical"]').setAttribute(
+            'href',
+            `https://themanamarket.com/product-details?id=${product.id}`
+        );
+        
+        // Update structured data
+        const structuredData = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name,
+            "description": product.description,
+            "url": `https://themanamarket.com/product-details?id=${product.id}`,
+            "image": product.imageUrl,
+            "brand": {
+                "@type": "Brand",
+                "name": "The Mana Market"
+            },
+            "offers": {
+                "@type": "Offer",
+                "priceCurrency": "USD",
+                "price": product.price.toString(),
+                "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+            }
+        };
+        
+        document.getElementById('productSchema').textContent = JSON.stringify(structuredData, null, 2);
+    }
+
+    // Call this function when your product data is loaded
+    // Example usage:
+    /*
+    fetchProductDetails(productId).then(product => {
+        updateProductMetadata(product);
+    });
+    */
     </script>
     
     <!-- Google tag (gtag.js) -->
