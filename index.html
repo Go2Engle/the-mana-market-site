@@ -74,13 +74,49 @@
             transform: scale(1);
             transition: opacity 100ms ease-out, transform 100ms ease-out;
         }
+        .text-gradient {
+            background: linear-gradient(to right, #4F46E5, #818CF8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: heroFadeIn 0.8s ease-out forwards;
+        }
+        .hero-fade-in-delay {
+            animation-delay: 0.3s;
+        }
+        @keyframes heroFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #818CF8);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(79, 70, 229, 0.2);
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col">
     <!-- Navigation -->
-    <nav class="fixed w-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm z-50 transition-colors duration-200">
+    <nav class="fixed w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50 transition-colors duration-200">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="text-2xl font-bold text-primary-light dark:text-primary-dark">The Mana Market</div>
+            <div class="text-2xl font-bold text-gradient">The Mana Market</div>
             
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-8">
@@ -124,7 +160,10 @@
             <div class="absolute inset-0 bg-black/50 z-10"></div>
             
             <!-- Hero Image -->
-            <div id="hero-carousel" class="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-500"></div>
+            <div id="hero-carousel" class="absolute inset-0 w-full h-full">
+                <div id="hero-image-1" class="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-1000"></div>
+                <div id="hero-image-2" class="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-1000 opacity-0"></div>
+            </div>
 
             <!-- Navigation Buttons -->
             <button id="prev-slide" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 text-white hover:text-primary-light transition-colors">
@@ -137,10 +176,10 @@
             <!-- Content -->
             <div class="relative container mx-auto px-4 text-center text-white z-20">
                 <div id="hero-content" class="max-w-3xl mx-auto">
-                    <h1 id="hero-title" class="text-4xl md:text-5xl font-bold mb-4"></h1>
-                    <p id="hero-description" class="text-lg md:text-xl mb-6"></p>
+                    <h1 id="hero-title" class="text-4xl md:text-5xl font-bold mb-4 hero-fade-in"></h1>
+                    <p id="hero-description" class="text-lg md:text-xl mb-6 hero-fade-in hero-fade-in-delay"></p>
                     <a id="hero-link" href="#" target="_blank" rel="noopener noreferrer" 
-                    class="inline-block bg-primary-light hover:bg-primary-dark text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                    class="btn-primary inline-block text-white font-bold py-3 px-8 rounded-lg">
                         Shop Now
                     </a>
                 </div>
@@ -150,7 +189,7 @@
         <!-- Featured Products Section -->
         <section id="featured" class="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
             <div class="container mx-auto px-4">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white text-center">Featured Products</h2>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gradient text-center">Featured Products</h2>
                 <p class="text-gray-600 dark:text-gray-400 text-center mb-12">Discover our most popular items</p>
                 
                 <!-- Featured Items Grid -->
@@ -160,7 +199,7 @@
                 
                 <!-- View All Products Button -->
                 <div class="text-center">
-                    <a href="products.html" class="inline-block px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
+                    <a href="products.html" class="btn-primary inline-block px-8 py-3 text-white rounded-lg transition">
                         View All Products
                     </a>
                 </div>
@@ -171,7 +210,7 @@
         <section id="about" class="py-20 bg-white dark:bg-gray-800 transition-colors duration-200">
             <div class="container mx-auto px-4">
                 <div class="max-w-3xl mx-auto text-center">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-gray-900 dark:text-white">About The Mana Market</h2>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-gradient">About The Mana Market</h2>
                     <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
                         Welcome to The Mana Market, your premier destination for high-quality Magic: The Gathering accessories. 
                         We specialize in creating unique, durable products that enhance your gaming experience.

@@ -227,26 +227,60 @@ function initializeMobileMenu() {
 
 // Function to update hero content
 function updateHeroContent() {
-    const slide = heroSlides[currentSlide];
-    const carousel = document.getElementById('hero-carousel');
-    const content = document.getElementById('hero-content');
+    const titleElement = document.getElementById('hero-title');
+    const descriptionElement = document.getElementById('hero-description');
+    const linkElement = document.getElementById('hero-link');
+    const image1 = document.getElementById('hero-image-1');
+    const image2 = document.getElementById('hero-image-2');
     
-    if (!carousel || !content) return;
+    if (currentSlide >= 0 && currentSlide < heroSlides.length) {
+        const slide = heroSlides[currentSlide];
+        
+        // Remove and re-add animation classes to restart animation
+        titleElement.classList.remove('hero-fade-in');
+        descriptionElement.classList.remove('hero-fade-in', 'hero-fade-in-delay');
+        
+        // Force a reflow to restart animations
+        void titleElement.offsetWidth;
+        void descriptionElement.offsetWidth;
+        
+        // Update content
+        titleElement.textContent = slide.title;
+        descriptionElement.textContent = slide.description;
+        linkElement.href = slide.link;
+        
+        // Handle image crossfade
+        const currentImage = activeImageElement === 1 ? image1 : image2;
+        const nextImage = activeImageElement === 1 ? image2 : image1;
+        
+        // Set the new image on the hidden element
+        nextImage.style.backgroundImage = `url('${slide.image}')`;
+        
+        // Fade out current image and fade in next image
+        currentImage.style.opacity = '0';
+        nextImage.style.opacity = '1';
+        
+        // Toggle active image for next update
+        activeImageElement = activeImageElement === 1 ? 2 : 1;
+        
+        // Re-add animation classes
+        titleElement.classList.add('hero-fade-in');
+        descriptionElement.classList.add('hero-fade-in', 'hero-fade-in-delay');
+    }
+}
 
-    // Update background image
-    carousel.style.backgroundImage = `url(${slide.image})`;
-    carousel.style.backgroundSize = 'cover';
-    carousel.style.backgroundPosition = 'center';
+let activeImageElement = 1; // Track which image element is currently active
 
-    // Update content
-    content.innerHTML = `
-        <h1 class="text-4xl md:text-6xl font-bold mb-4">${slide.title}</h1>
-        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">${slide.description}</p>
-        <a href="${slide.link}" target="_blank" rel="noopener noreferrer" 
-           class="inline-block px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
-            Shop Now
-        </a>
-    `;
+// Initialize hero images
+function initializeHeroImages() {
+    const image1 = document.getElementById('hero-image-1');
+    const image2 = document.getElementById('hero-image-2');
+    
+    if (heroSlides.length > 0) {
+        image1.style.backgroundImage = `url('${heroSlides[0].image}')`;
+        image1.style.opacity = '1';
+        image2.style.opacity = '0';
+    }
 }
 
 // Function to go to next slide
@@ -911,6 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayProductDetails();
     } else {
         // Homepage initialization
+        initializeHeroImages();
         Promise.all([
             updateHeroSection(),
             updateFeaturedItems(),
