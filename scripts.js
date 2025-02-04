@@ -963,7 +963,7 @@ function createMenuBar() {
     
     nav.innerHTML = `
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="text-2xl font-bold text-gradient">The Mana Market</div>
+            <div id="home-link" class="text-2xl font-bold text-gradient cursor-pointer">The Mana Market</div>
             
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-8">
@@ -1019,6 +1019,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeTheme();
     initializeMobileMenu();
+
+    // Add event listener to "The Mana Market" text
+    const homeLink = document.getElementById('home-link');
+    if (homeLink) {
+        homeLink.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
 
     // Check if we're on the products page
     if (window.location.pathname.includes('products.html')) {
