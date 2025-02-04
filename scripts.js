@@ -935,6 +935,19 @@ async function displayProductDetails() {
                     mainImage.alt = thumbnail.alt;
                 });
             });
+
+            // Add zoom functionality to modal image
+            let isZoomed = false;
+            modalImage.addEventListener('click', () => {
+                if (isZoomed) {
+                    modalImage.style.transform = 'scale(1)';
+                    modalImage.style.cursor = 'zoom-in';
+                } else {
+                    modalImage.style.transform = 'scale(2)';
+                    modalImage.style.cursor = 'zoom-out';
+                }
+                isZoomed = !isZoomed;
+            });
         }
 
     } catch (error) {
