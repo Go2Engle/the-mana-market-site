@@ -933,11 +933,70 @@ async function displayProductDetails() {
     }
 }
 
+// Function to create menu bar for consistency across pages
+function createMenuBar() {
+    const nav = document.createElement('nav');
+    nav.className = 'fixed w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50 transition-colors duration-200';
+    
+    nav.innerHTML = `
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gradient">The Mana Market</div>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Home</a>
+                <a href="products.html" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Products</a>
+                <a href="index.html#testimonials" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Reviews</a>
+                <a href="index.html#about" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">About</a>
+                <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-theme-toggle" class="mr-4 text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+                <button id="mobile-menu-button" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-gray-800 transition-colors duration-200">
+            <div class="container mx-auto px-4 py-4 space-y-4">
+                <a href="index.html" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Home</a>
+                <a href="products.html" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Products</a>
+                <a href="index.html#testimonials" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Reviews</a>
+                <a href="index.html#about" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">About</a>
+            </div>
+        </div>
+    `;
+    
+    return nav;
+}
+
 // Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Insert navigation bar
+    const menuContainer = document.getElementById('menu-container');
+    const nav = createMenuBar();
+    
+    if (menuContainer) {
+        // If menu-container exists, insert into it
+        menuContainer.appendChild(nav);
+    } else {
+        // Otherwise, insert at the start of body
+        document.body.insertBefore(nav, document.body.firstChild);
+    }
+    
     initializeTheme();
     initializeMobileMenu();
-    
+
     // Check if we're on the products page
     if (window.location.pathname.includes('products.html')) {
         initializeProductFilters();
