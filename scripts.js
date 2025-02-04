@@ -830,7 +830,7 @@ async function displayProductDetails() {
                 <!-- Product Info -->
                 <div class="space-y-8">
                     <div class="space-y-4">
-                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white leading-tight">${displayTitle}</h1>
+                        <h1 class="text-4xl font-bold bg-gradient-to-br from-gray-900 to-primary-light dark:from-white dark:to-primary-dark bg-clip-text text-transparent leading-tight hover:scale-[1.01] transform transition-all duration-300">${displayTitle}</h1>
                         <p class="text-3xl font-bold bg-gradient-to-r from-primary-light to-primary-dark bg-clip-text text-transparent">$${product.PRICE}</p>
                     </div>
 
@@ -862,8 +862,10 @@ async function displayProductDetails() {
                         <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Tags</h3>
                         <div class="flex flex-wrap gap-3">
                             ${product.TAGS.split(',').map(tag => `
-                                <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-                                    ${tag.trim().replace(/_/g, ' ')}
+                                <span class="group relative px-4 py-2 bg-gradient-to-br from-gray-100 to-white dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden">
+                                    <span class="relative z-10 inline-block group-hover:translate-x-1 transition-transform duration-300">${tag.trim().replace(/_/g, ' ')}</span>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-primary-light/10 to-primary-dark/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-primary-light to-primary-dark group-hover:w-full transition-all duration-300"></div>
                                 </span>
                             `).join('')}
                         </div>
