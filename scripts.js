@@ -814,36 +814,41 @@ async function displayProductDetails() {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Image Gallery -->
                 <div class="space-y-4">
-                    <div class="aspect-w-1 aspect-h-1">
-                        <img src="${images[0]}" alt="${displayTitle}" class="w-full h-96 object-cover rounded-lg cursor-pointer product-image" id="main-image">
+                    <div class="aspect-w-1 aspect-h-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <img src="${images[0]}" alt="${displayTitle}" class="w-full h-96 object-cover cursor-pointer product-image hover:scale-105 transition-transform duration-300" id="main-image">
                     </div>
-                    <div class="grid grid-cols-5 gap-2">
+                    <div class="grid grid-cols-5 gap-4">
                         ${images.map((img, index) => `
-                            <img src="${img}" alt="${displayTitle} ${index + 1}" 
-                                class="w-full h-20 object-cover rounded cursor-pointer hover:opacity-75 transition product-image">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                                <img src="${img}" alt="${displayTitle} ${index + 1}" 
+                                    class="w-full h-20 object-cover cursor-pointer hover:opacity-75 transition-all duration-300 transform hover:scale-110 product-image">
+                            </div>
                         `).join('')}
                     </div>
                 </div>
 
                 <!-- Product Info -->
-                <div class="space-y-6">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">${displayTitle}</h1>
-                    <p class="text-2xl font-bold text-primary-light dark:text-primary-dark">$${product.PRICE}</p>
-                    <div class="prose dark:prose-invert max-w-none">
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white leading-tight">${displayTitle}</h1>
+                        <p class="text-3xl font-bold bg-gradient-to-r from-primary-light to-primary-dark bg-clip-text text-transparent">$${product.PRICE}</p>
+                    </div>
+
+                    <div class="prose dark:prose-invert max-w-none space-y-4">
                         ${product.DESCRIPTION.split('\n').map(line => 
-                            `<p class="text-gray-600 dark:text-gray-300">${line}</p>`
+                            `<p class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">${line}</p>`
                         ).join('')}
                     </div>
 
                     ${variations.length > 0 ? `
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Options</h3>
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Options</h3>
                             ${variations.map(variation => `
-                                <div>
-                                    <h4 class="font-medium mb-2 text-gray-900 dark:text-white">${variation.name}</h4>
-                                    <div class="flex flex-wrap gap-2">
+                                <div class="space-y-3">
+                                    <h4 class="font-medium text-lg text-gray-900 dark:text-white">${variation.name}</h4>
+                                    <div class="flex flex-wrap gap-3">
                                         ${variation.values.map(value => `
-                                            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded">
+                                            <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                                                 ${value.trim()}
                                             </span>
                                         `).join('')}
@@ -854,20 +859,23 @@ async function displayProductDetails() {
                     ` : ''}
 
                     <div class="space-y-4">
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Tags</h3>
-                        <div class="flex flex-wrap gap-2">
+                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Tags</h3>
+                        <div class="flex flex-wrap gap-3">
                             ${product.TAGS.split(',').map(tag => `
-                                <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded">
+                                <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                                     ${tag.trim().replace(/_/g, ' ')}
                                 </span>
                             `).join('')}
                         </div>
                     </div>
 
-                    <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
-                       class="inline-block px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:opacity-90 transition">
-                        View on Etsy
-                    </a>
+                    <div class="pt-6">
+                        <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
+                           class="group w-full flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#F1641E] to-[#FF8A3D] text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                            <i class="fab fa-etsy text-2xl mr-3 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="text-lg font-semibold">View on Etsy</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         `;
