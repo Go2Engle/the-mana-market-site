@@ -5,62 +5,7 @@ const themeToggle = document.getElementById('theme-toggle');
 const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
 
 // Hero carousel data
-const heroSlides = [
-    {
-        title: "Starry Mountain Playmat",
-        description: "Transform your gaming experience with our premium playmats featuring stunning artwork",
-        image: "https://i.etsystatic.com/54979645/r/il/4af290/6525855154/il_fullxfull.6525855154_7xqn.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    },
-    {
-        title: "Enchanted Forest Playmat",
-        description: "Immerse yourself in a mystical realm with our enchanted forest themed playmat",
-        image: "https://i.etsystatic.com/54979645/r/il/581bc4/6393034325/il_fullxfull.6393034325_1rvz.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    },
-    {
-        title: "Cosmic Constellation Playmat",
-        description: "Experience the wonders of the cosmos with our celestial-themed playmat design",
-        image: "https://i.etsystatic.com/54979645/r/il/4af290/6525855154/il_fullxfull.6525855154_7xqn.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    },
-    {
-        title: "Ancient Ruins Playmat",
-        description: "Battle among the remnants of a forgotten civilization with this atmospheric playmat",
-        image: "https://i.etsystatic.com/54979645/r/il/581bc4/6393034325/il_fullxfull.6393034325_1rvz.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    },
-    {
-        title: "Mystic Garden Playmat",
-        description: "Enter a world of wonder with our beautifully detailed garden-themed playmat",
-        image: "https://i.etsystatic.com/54979645/r/il/4af290/6525855154/il_fullxfull.6525855154_7xqn.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    }
-];
-
-// Featured products data
-const featuredProducts = [
-    {
-        title: "Starry Mountain Playmat",
-        price: "$25.00",
-        description: "A breathtaking design featuring a mesmerizing nightscape with a vibrant starry sky swirling above majestic mountains.",
-        image: "https://i.etsystatic.com/54979645/r/il/4af290/6525855154/il_fullxfull.6525855154_7xqn.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    },
-    {
-        title: "The Mana Market Hooded Sweatshirt",
-        price: "$35.57",
-        description: "Premium cotton-poly blend hoodie with a classic fit, spacious kangaroo pocket, and color-matched drawcord.",
-        image: "https://i.etsystatic.com/54979645/r/il/581bc4/6393034325/il_fullxfull.6393034325_1rvz.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    },
-    {
-        title: "Enchanted Forest Deck Box",
-        description: "A beautifully crafted deck box featuring an enchanted forest design, perfect for protecting your favorite deck.",
-        image: "https://i.etsystatic.com/54979645/r/il/4af290/6525855154/il_fullxfull.6525855154_7xqn.jpg",
-        link: "https://www.etsy.com/shop/themanamarket"
-    }
-];
+const heroSlides = [];
 
 // Reviews data
 let reviews = [];
