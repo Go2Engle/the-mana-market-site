@@ -895,10 +895,83 @@ async function displayProductDetails() {
             });
         }
 
+        // Display similar items
+        await displaySimilarItems(product);
+
     } catch (error) {
         console.error('Error displaying product details:', error);
         productDetails.innerHTML = '<p class="text-center text-gray-900 dark:text-white">Error loading product details</p>';
     }
+}
+
+// Function to display similar items
+async function displaySimilarItems(currentProduct) {
+    const similarItemsContainer = document.getElementById('similar-items');
+    if (!similarItemsContainer) return;
+
+    try {
+        const listings = await fetchEtsyListings();
+        
+        // Filter out the current product
+        const otherProducts = listings.filter(item => item.TITLE !== currentProduct.TITLE);
+        
+        // Get current product tags and category
+        const currentTags = currentProduct.TAGS.toLowerCase().split(',').map(tag => tag.trim());
+        const currentCategory = getProductCategory(currentProduct.TITLE);
+        
+        // Score each product based on similarity
+        const scoredProducts = otherProducts.map(product => {
+            const productTags = product.TAGS.toLowerCase().split(',').map(tag => tag.trim());
+            const productCategory = getProductCategory(product.TITLE);
+            
+            // Calculate similarity score
+            let score = 0;
+            // Category match is worth 5 points
+            if (productCategory === currentCategory) score += 5;
+            // Each matching tag is worth 1 point
+            score += productTags.filter(tag => currentTags.includes(tag)).length;
+            
+            return { product, score };
+        });
+        
+        // Sort by score and take top 4
+        const similarProducts = scoredProducts
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 4)
+            .map(item => item.product);
+        
+        // Generate HTML for similar items
+        const html = similarProducts.map(product => {
+            const title = product.TITLE.replace('The Mana Market: ', '');
+            const detailsUrl = `product-details.html?title=${encodeURIComponent(product.TITLE)}`;
+            
+            return `
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
+                    <a href="${detailsUrl}" class="block">
+                        <img src="${product.IMAGE1}" alt="${title}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">${title}</h3>
+                            <span class="text-lg font-bold text-primary-light dark:text-primary-dark">$${product.PRICE}</span>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }).join('');
+        
+        similarItemsContainer.innerHTML = html;
+    } catch (error) {
+        console.error('Error displaying similar items:', error);
+        similarItemsContainer.innerHTML = '<p class="text-center text-gray-600 dark:text-gray-400">Unable to load similar items</p>';
+    }
+}
+
+// Helper function to get product category
+function getProductCategory(title) {
+    title = title.toLowerCase();
+    if (title.includes('playmat')) return 'Playmats';
+    if (title.includes('deck box')) return 'Deck Boxes';
+    if (title.includes('shirt') || title.includes('hoodie')) return 'Apparel';
+    return 'Other';
 }
 
 // Function to create menu bar for consistency across pages
