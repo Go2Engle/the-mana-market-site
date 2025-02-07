@@ -193,6 +193,9 @@ function updateHeroContent() {
         titleElement.textContent = slide.title;
         descriptionElement.textContent = slide.description;
         linkElement.href = slide.link;
+        // Remove target="_blank" and rel attributes since we're opening in same tab
+        linkElement.removeAttribute('target');
+        linkElement.removeAttribute('rel');
         
         // Handle image crossfade
         const currentImage = activeImageElement === 1 ? image1 : image2;
@@ -430,7 +433,7 @@ async function updateHeroSection() {
                     title: title,
                     description: description,
                     image: product.IMAGE1,
-                    link: getEtsySearchUrl(product) // This will now use the direct URL from CSV
+                    link: `product-details.html?title=${encodeURIComponent(product.TITLE)}` // Changed to link to product details
                 });
             });
 
@@ -817,7 +820,7 @@ async function displayProductDetails() {
                     </div>
 
                     <div class="pt-6">
-                        <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" 
+                        <a href="${searchUrl}" 
                            class="group w-full flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#F1641E] to-[#FF8A3D] text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
                             <i class="fab fa-etsy text-2xl mr-3 group-hover:scale-110 transition-transform duration-300"></i>
                             <span class="text-lg font-semibold">View on Etsy</span>
