@@ -1,170 +1,45 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth h-full">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTG Accessories & Products - The Mana Market | Playmats, Deck Boxes & More</title>
-    <meta name="description" content="Browse our extensive collection of premium Magic: The Gathering accessories. High-quality playmats, deck boxes, card sleeves and more. Fast shipping, great prices!">
-    <meta name="keywords" content="MTG accessories, Magic The Gathering products, playmats, deck boxes, card sleeves, MTG store">
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shop TCG Accessories | The Mana Market</title>
+    <meta name="description" content="Browse playmats, deck boxes, bags, apparel and TCG accessories from The Mana Market.">
+    <meta name="keywords" content="MTG accessories, Magic The Gathering products, playmats, deck boxes, TCG bags, MTG apparel">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="MTG Accessories & Products - The Mana Market">
-    <meta property="og:description" content="Browse our extensive collection of premium Magic: The Gathering accessories. High-quality playmats, deck boxes, card sleeves and more.">
+    <meta property="og:title" content="Shop TCG Accessories | The Mana Market">
+    <meta property="og:description" content="Browse the current collection of playmats, deck boxes, bags and apparel from The Mana Market.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://themanamarket.com/products">
     <link rel="canonical" href="https://themanamarket.com/products">
-
-    <!-- Structured Data -->
+    <meta name="theme-color" content="#ffffff"><link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://i.etsystatic.com"><link rel="stylesheet" href="styles.css?v=2.0.2">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "MTG Accessories & Products",
-      "description": "Browse our extensive collection of premium Magic: The Gathering accessories",
+      "name": "TCG Accessories & Products",
+      "description": "Browse playmats, deck boxes, bags, apparel and TCG accessories from The Mana Market.",
       "url": "https://themanamarket.com/products",
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": "The Mana Market",
-        "url": "https://themanamarket.com"
-      }
+      "isPartOf": {"@type": "WebSite", "name": "The Mana Market", "url": "https://themanamarket.com/"}
     }
     </script>
-    
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1G89FFLPYP"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-1G89FFLPYP');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1G89FFLPYP');
     </script>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-light': '#4F46E5',
-                        'primary-dark': '#818CF8'
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col">
+<body>
     <div id="menu-container"></div>
-
-    <!-- Products Section -->
-    <main class="pt-16 flex-grow">
-        <!-- Breadcrumbs -->
-        <div class="border-b border-gray-200/10 dark:border-gray-700/10">
-            <div class="container mx-auto px-4 py-2">
-                <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                    <a href="index.html" class="hover:text-primary-light dark:hover:text-primary-dark">
-                        <i class="fas fa-home"></i>
-                    </a>
-                    <span class="text-gray-400/50 dark:text-gray-600/50">/</span>
-                    <span class="text-gray-900 dark:text-white">Products</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="container mx-auto px-4 py-8">
-            <h1 class="text-3xl md:text-4xl font-bold mb-8 text-gray-900 dark:text-white text-center">Our Products</h1>
-            
-            <!-- Filters Toggle Button for Mobile -->
-            <div class="md:hidden mb-4 flex justify-end">
-                <button id="toggle-filters" class="w-1/4 px-4 py-2 bg-gradient-to-r from-primary-light to-primary-dark text-white rounded-md">
-                    Filter
-                </button>
-            </div>
-
-            <!-- Filters -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div id="filters" class="md:col-span-1 space-y-6 hidden md:block">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                        <h2 class="font-semibold text-lg mb-4 text-gray-900 dark:text-white">Filters</h2>
-                        
-                        <!-- Search -->
-                        <div class="mb-6">
-                            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
-                            <input type="text" id="search" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark dark:bg-gray-700 dark:text-white">
-                        </div>
-                        
-                        <!-- Category Filter -->
-                        <div class="mb-6">
-                            <h3 class="font-medium text-gray-900 dark:text-white mb-2">Category</h3>
-                            <div id="category-filters" class="space-y-2">
-                                <!-- Categories will be populated by JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <!-- Price Range -->
-                        <div class="mb-6">
-                            <h3 class="font-medium text-gray-900 dark:text-white mb-2">Price Range</h3>
-                            <div class="flex space-x-4">
-                                <input type="number" id="min-price" placeholder="Min" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark dark:bg-gray-700 dark:text-white">
-                                <input type="number" id="max-price" placeholder="Max" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark dark:bg-gray-700 dark:text-white">
-                            </div>
-                        </div>
-                        
-                        <!-- Sort -->
-                        <div class="mb-6">
-                            <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</label>
-                            <select id="sort" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark dark:bg-gray-700 dark:text-white">
-                                <option value="featured">Featured</option>
-                                <option value="price-asc">Price: Low to High</option>
-                                <option value="price-desc">Price: High to Low</option>
-                                <option value="name-asc">Name: A to Z</option>
-                                <option value="name-desc">Name: Z to A</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Clear Filters -->
-                        <button id="clear-filters" class="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                            Clear Filters
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Product Grid -->
-                <div class="md:col-span-3">
-                    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Products will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </div>
+    <main>
+        <section class="catalog-hero"><div class="shell"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><span>Products</span></nav><h1>Products</h1><p>Browse everything currently available in The Mana Market shop.</p></div></section>
+        <section class="catalog shell">
+            <div class="catalog-toolbar"><div><strong id="product-count">Loading products…</strong></div><div class="toolbar-actions"><button id="toggle-filters" class="filter-toggle" type="button" aria-expanded="false">Filters <span>＋</span></button><label class="sort-label" for="sort">Sort <select id="sort"><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="name-asc">Name: A–Z</option><option value="name-desc">Name: Z–A</option></select></label></div></div>
+            <div class="catalog-layout"><aside id="filters" class="filters-panel" aria-label="Product filters"><div class="filter-head"><h2>Filters</h2><button id="clear-filters" type="button">Reset</button></div><label class="search-field" for="search"><span class="sr-only">Search products</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="search" type="search" placeholder="Search products…"></label><fieldset><legend>Category</legend><div id="category-filters" class="filter-options"></div></fieldset><fieldset><legend>Price range</legend><div class="price-row"><label>$<input type="number" id="min-price" min="0" placeholder="Min"></label><span>—</span><label>$<input type="number" id="max-price" min="0" placeholder="Max"></label></div></fieldset></aside><div id="products-grid" class="product-grid catalog-grid" aria-live="polite"></div></div>
+        </section>
     </main>
-
-    <!-- Removed Customer Reviews Section -->
-
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-800 py-8 border-t border-gray-200 dark:border-gray-700">
-        <div class="container mx-auto px-4">
-            <div class="text-center text-gray-600 dark:text-gray-400">
-                <p>&copy; 2025 The Mana Market. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="scripts.js"></script>
-    <script>
-        // Toggle filters visibility on mobile
-        document.getElementById('toggle-filters').addEventListener('click', function() {
-            const filters = document.getElementById('filters');
-            filters.classList.toggle('hidden');
-        });
-    </script>
+    <div id="footer-container"></div><script src="scripts.js?v=2.0.2"></script>
 </body>
 </html>

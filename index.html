@@ -1,227 +1,97 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth h-full">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Mana Market - Premium MTG Accessories | Magic: The Gathering Store</title>
-    <meta name="description" content="Shop premium Magic: The Gathering accessories at The Mana Market. Find exclusive playmats, deck boxes, card sleeves and more. Free shipping on orders over $50!">
-    <meta name="keywords" content="MTG accessories, Magic The Gathering, playmats, deck boxes, card sleeves, MTG store">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Mana Market | TCG Playmats, Deck Boxes & Gear</title>
+    <meta name="description" content="Shop playmats, deck boxes, bags and apparel from The Mana Market.">
+    <meta name="keywords" content="MTG accessories, Magic The Gathering, playmats, deck boxes, TCG bags, MTG apparel">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="The Mana Market - Premium MTG Accessories">
-    <meta property="og:description" content="Shop premium Magic: The Gathering accessories at The Mana Market. Find exclusive playmats, deck boxes, card sleeves and more.">
+    <meta property="og:title" content="The Mana Market | TCG Playmats, Deck Boxes & Gear">
+    <meta property="og:description" content="Shop playmats, deck boxes, bags and apparel from The Mana Market.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://themanamarket.com">
-    <link rel="canonical" href="https://themanamarket.com">
-    
-    <!-- Structured Data -->
+    <meta property="og:url" content="https://themanamarket.com/">
+    <link rel="canonical" href="https://themanamarket.com/">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://i.etsystatic.com">
+    <link rel="stylesheet" href="styles.css?v=2.0.2">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Store",
       "name": "The Mana Market",
-      "description": "Premium Magic: The Gathering accessories store",
-      "url": "https://themanamarket.com",
-      "telephone": "+1-555-555-5555",
-      "priceRange": "$$",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Your Street Address",
-        "addressLocality": "Your City",
-        "addressRegion": "Your State",
-        "postalCode": "Your Zip",
-        "addressCountry": "US"
-      }
+      "description": "Playmats, deck boxes, bags and apparel for trading card game players.",
+      "url": "https://themanamarket.com/",
+      "sameAs": ["https://www.etsy.com/shop/themanamarket"],
+      "priceRange": "$$"
     }
     </script>
-
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1G89FFLPYP"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-1G89FFLPYP');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1G89FFLPYP');
     </script>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-light': '#4F46E5',
-                        'primary-dark': '#818CF8'
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Custom Styles -->
-    <style>
-        .mobile-menu-enter {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        .mobile-menu-enter-active {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 100ms ease-out, transform 100ms ease-out;
-        }
-        .text-gradient {
-            background: linear-gradient(to right, #4F46E5, #818CF8);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero-fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: heroFadeIn 0.8s ease-out forwards;
-        }
-        .hero-fade-in-delay {
-            animation-delay: 0.3s;
-        }
-        @keyframes heroFadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #4F46E5, #818CF8);
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(79, 70, 229, 0.2);
-        }
-    </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col">
+<body>
     <div id="menu-container"></div>
 
-    <!-- Main Content -->
-    <main class="flex-grow">
-        <!-- Hero Section -->
-        <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 bg-black/50 z-10"></div>
-            
-            <!-- Hero Image -->
-            <div id="hero-carousel" class="absolute inset-0 w-full h-full">
-                <div id="hero-image-1" class="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-1000"></div>
-                <div id="hero-image-2" class="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-1000 opacity-0"></div>
-            </div>
-
-            <!-- Navigation Buttons - Updated with better interaction area -->
-            <div class="absolute inset-0 flex items-center justify-between z-30 pointer-events-none">
-                <button id="prev-slide" class="pointer-events-auto p-4 md:p-6 text-white hover:text-primary-light hover:bg-black/10 transition-all duration-300 rounded-r">
-                    <i class="fas fa-chevron-left text-xl md:text-3xl"></i>
-                </button>
-                <button id="next-slide" class="pointer-events-auto p-4 md:p-6 text-white hover:text-primary-light hover:bg-black/10 transition-all duration-300 rounded-l">
-                    <i class="fas fa-chevron-right text-xl md:text-3xl"></i>
-                </button>
-            </div>
-
-            <!-- Content -->
-            <div class="relative container mx-auto px-12 md:px-4 text-center text-white z-20">
-                <div id="hero-content" class="max-w-3xl mx-auto">
-                    <h1 id="hero-title" class="text-4xl md:text-5xl font-bold mb-4 hero-fade-in"></h1>
-                    <p id="hero-description" class="text-lg md:text-xl mb-6 hero-fade-in hero-fade-in-delay"></p>
-                    <a id="hero-link" href="#" class="btn-primary inline-block text-white font-bold py-3 px-8 rounded-lg">
-                        Shop Now
-                    </a>
+    <main>
+        <section class="hero shell">
+            <div class="hero-copy">
+                <p class="eyebrow">The Mana Market</p>
+                <h1>TCG gear for your next game night.</h1>
+                <p class="hero-lede">Shop playmats, deck boxes, bags, and apparel made for Magic: The Gathering players.</p>
+                <div class="hero-actions">
+                    <a class="button button-primary" href="products.html">Shop all products</a>
+                    <a class="button button-secondary" href="https://www.etsy.com/shop/themanamarket" target="_blank" rel="noopener">Visit our Etsy shop ↗</a>
                 </div>
+            </div>
+            <a id="hero-product-link" class="hero-product" href="products.html">
+                <img id="hero-product-image" src="" alt="Featured Mana Market product">
+                <div class="hero-product-caption">
+                    <span>Featured product</span>
+                    <strong id="hero-product-name">Loading…</strong>
+                    <b id="hero-product-price"></b>
+                </div>
+            </a>
+        </section>
+
+        <section class="category-bar">
+            <div class="shell">
+                <a href="products.html?category=Playmats">Playmats</a>
+                <a href="products.html?category=Deck%20Boxes">Deck boxes</a>
+                <a href="products.html?category=Carry%20Gear">Bags</a>
+                <a href="products.html?category=Apparel">Apparel</a>
             </div>
         </section>
 
-        <!-- Featured Products Section -->
-        <section id="featured" class="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gradient text-center">Featured Products</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-center mb-12">Discover our most popular items</p>
-                
-                <!-- Featured Items Grid -->
-                <div id="featured-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    <!-- Items will be populated by JavaScript -->
-                </div>
-                
-                <!-- View All Products Button -->
-                <div class="text-center">
-                    <a href="products.html" class="btn-primary inline-block px-8 py-3 text-white rounded-lg transition">
-                        View All Products
-                    </a>
-                </div>
+        <section class="section shell">
+            <div class="section-heading split-heading">
+                <div><p class="eyebrow">Shop the collection</p><h2>Featured products</h2></div>
+                <a class="text-link" href="products.html">View all products →</a>
+            </div>
+            <div id="featured-items" class="product-grid" aria-live="polite">
+                <div class="product-skeleton"></div><div class="product-skeleton"></div><div class="product-skeleton"></div><div class="product-skeleton"></div>
             </div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="py-20 bg-white dark:bg-gray-800 transition-colors duration-200">
-            <div class="container mx-auto px-4">
-                <div class="max-w-3xl mx-auto text-center">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-gradient">About The Mana Market</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
-                        Welcome to The Mana Market, your premier destination for high-quality Magic: The Gathering accessories. 
-                        We specialize in creating unique, durable products that enhance your gaming experience.
-                    </p>
-                    <p class="text-lg text-gray-600 dark:text-gray-400">
-                        From custom playmats to deck boxes, each item is crafted with care and attention to detail. 
-                        Our products are designed by MTG enthusiasts, for MTG enthusiasts.
-                    </p>
-                </div>
+        <section class="about-section">
+            <div class="shell about-grid">
+                <div><p class="eyebrow">About the shop</p><h2>Made for players.</h2></div>
+                <div><p>The Mana Market is an independent shop focused on practical, good-looking accessories for tabletop gaming. Browse the current catalog here, then complete your purchase securely through Etsy.</p><a class="text-link" href="products.html">Browse the catalog →</a></div>
             </div>
         </section>
 
-        <!-- Testimonials -->
-        <section id="testimonials" class="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">What Our Customers Say</h2>
-                
-                <div class="relative max-w-7xl mx-auto">
-                    <!-- Reviews track with gradient masks -->
-                    <div class="relative">
-                        <!-- Left fade gradient -->
-                        <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-900 z-[1] pointer-events-none"></div>
-                        
-                        <!-- Right fade gradient -->
-                        <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent dark:from-gray-900 z-[1] pointer-events-none"></div>
-                        
-                        <!-- Scrolling container -->
-                        <div class="overflow-hidden">
-                            <div id="reviews-container" class="flex gap-6 transition-transform duration-500 ease-out px-4">
-                                <!-- Reviews will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <section id="testimonials" class="section shell">
+            <div class="section-heading"><p class="eyebrow">Customer reviews</p><h2>What players are saying</h2></div>
+            <div id="reviews-window" class="reviews-window"><div id="reviews-container" class="reviews-track" aria-live="polite"></div></div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-800 py-8 border-t border-gray-200 dark:border-gray-700">
-        <div class="container mx-auto px-4">
-            <div class="text-center text-gray-600 dark:text-gray-400">
-                <p>&copy; 2024 The Mana Market. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="scripts.js?v=1.0.0"></script>
+    <div id="footer-container"></div>
+    <script src="scripts.js?v=2.0.2"></script>
 </body>
 </html>

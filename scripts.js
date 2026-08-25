@@ -1,1068 +1,302 @@
-// DOM Elements
-const mobileMenuButton = document.getElementById('mobile-menu-button');
-const mobileMenu = document.getElementById('mobile-menu');
-const themeToggle = document.getElementById('theme-toggle');
-const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+const STORE_URL = 'https://www.etsy.com/shop/themanamarket';
+let allProducts = [];
 
-// Hero carousel data
-const heroSlides = [];
+const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+const cleanTitle = (title = '') => title.replace(/^The Mana Market:\s*/i, '').trim();
+const productUrl = item => `product-details.html?title=${encodeURIComponent(item.TITLE)}`;
+const etsyUrl = item => item.url || item.URL || `${STORE_URL}/search?search_query=${encodeURIComponent(cleanTitle(item.TITLE))}`;
+const getCategory = item => {
+    const title = (item.TITLE || '').toLowerCase();
+    if (title.includes('deck box')) return 'Deck Boxes';
+    if (title.includes('bag')) return 'Carry Gear';
+    if (title.includes('shirt') || title.includes('hoodie') || title.includes('sweatshirt')) return 'Apparel';
+    if (title.includes('playmat') || title.includes('play mat')) return 'Playmats';
+    return 'Accessories';
+};
 
-// Reviews data
-let reviews = [];
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    for (let i = 0; i < text.length; i += 1) {
+        const char = text[i], next = text[i + 1];
+        if (char === '"' && quoted && next === '"') { field += '"'; i += 1; }
+        else if (char === '"') quoted = !quoted;
+        else if (char === ',' && !quoted) { row.push(field); field = ''; }
+        else if ((char === '\n' || char === '\r') && !quoted) {
+            if (char === '\r' && next === '\n') i += 1;
+            row.push(field); field = '';
+            if (row.some(cell => cell.trim())) rows.push(row);
+            row = [];
+        } else field += char;
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    if (!rows.length) return [];
+    const headers = rows.shift().map(header => header.trim());
+    return rows.map(values => Object.fromEntries(headers.map((header, index) => [header, (values[index] || '').trim()])));
+}
 
-// Fetch reviews from JSON file
-async function fetchReviews() {
+async function fetchProducts() {
+    if (allProducts.length) return allProducts;
+    const response = await fetch('EtsyListings.csv');
+    if (!response.ok) throw new Error('Unable to load product catalog');
+    allProducts = parseCSV(await response.text()).filter(item => item.TITLE && item.IMAGE1);
+    return allProducts;
+}
+
+function createHeader() {
+    const path = window.location.pathname;
+    const shopActive = path.includes('products') || path.includes('product-details');
+    return `
+        <header class="site-header">
+            <div class="nav-row shell">
+                <a class="brand" href="index.html" aria-label="The Mana Market home"><span class="brand-mark">M</span><span>The Mana Market</span></a>
+                <nav class="desktop-nav" aria-label="Main navigation"><a class="${shopActive ? '' : 'active'}" href="index.html">Home</a><a class="${shopActive ? 'active' : ''}" href="products.html">Products</a><a href="index.html#testimonials">Reviews</a></nav>
+                <div class="nav-actions"><a class="shop-button" href="${STORE_URL}" target="_blank" rel="noopener">Shop on Etsy ↗</a><button id="menu-toggle" class="menu-button" aria-label="Open menu" aria-expanded="false">☰</button></div>
+            </div>
+            <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation"><a href="index.html">Home</a><a href="products.html">Products</a><a href="index.html#testimonials">Reviews</a><a href="${STORE_URL}" target="_blank" rel="noopener">Shop on Etsy ↗</a></nav>
+        </header>`;
+}
+
+function createFooter() {
+    return `<footer class="site-footer"><div class="shell"><div class="footer-main"><a class="brand" href="index.html"><span class="brand-mark">M</span><span>The Mana Market</span></a><nav class="footer-links" aria-label="Footer navigation"><a href="products.html">Products</a><a href="index.html#testimonials">Reviews</a><a href="${STORE_URL}" target="_blank" rel="noopener">Etsy shop ↗</a></nav></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} The Mana Market</span><span>TCG accessories sold through Etsy</span></div></div></footer>`;
+}
+
+function initializeChrome() {
+    document.getElementById('menu-container').innerHTML = createHeader();
+    document.getElementById('footer-container').innerHTML = createFooter();
+    const menuButton = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuButton.addEventListener('click', () => {
+        const open = mobileMenu.classList.toggle('open');
+        menuButton.setAttribute('aria-expanded', String(open));
+        menuButton.textContent = open ? '×' : '☰';
+        document.body.classList.toggle('menu-open', open);
+    });
+}
+
+function productCard(item) {
+    const title = cleanTitle(item.TITLE);
+    const category = getCategory(item);
+    return `<article class="product-card"><a class="product-image-wrap" href="${productUrl(item)}"><img src="${escapeHtml(item.IMAGE1)}" alt="${escapeHtml(title)}" loading="lazy"></a><div class="product-meta"><span class="product-category">${category}</span><a class="product-name" href="${productUrl(item)}">${escapeHtml(title)}</a><div class="product-bottom"><span class="product-price">$${Number(item.PRICE).toFixed(2)}</span></div></div></article>`;
+}
+
+async function initializeHome() {
+    try {
+        const products = await fetchProducts();
+        const hero = products[0];
+        document.getElementById('hero-product-image').src = hero.IMAGE1;
+        document.getElementById('hero-product-image').alt = cleanTitle(hero.TITLE);
+        document.getElementById('hero-product-name').textContent = cleanTitle(hero.TITLE);
+        document.getElementById('hero-product-price').textContent = `$${Number(hero.PRICE).toFixed(2)}`;
+        document.getElementById('hero-product-link').href = productUrl(hero);
+        document.getElementById('featured-items').innerHTML = products.slice(0, 4).map(productCard).join('');
+    } catch (error) {
+        document.getElementById('featured-items').innerHTML = '<p class="empty-state">The collection could not be loaded right now. Please visit our Etsy shop.</p>';
+    }
     try {
         const response = await fetch('reviews.json');
-        reviews = await response.json();
-        populateTestimonials();
-    } catch (error) {
-        console.error('Error loading reviews:', error);
-    }
-}
-
-// Function to populate testimonials
-function populateTestimonials() {
-    const container = document.getElementById('reviews-container');
-    if (!container || !reviews.length) return;
-
-    // Clear existing content
-    container.innerHTML = '';
-
-    // Create a wrapper for the continuous scroll
-    const scrollWrapper = document.createElement('div');
-    scrollWrapper.className = 'reviews-scroll-wrapper flex gap-6';
-
-    // Create review cards
-    const createReviewCards = () => {
-        reviews.forEach((review) => {
-            const reviewCard = document.createElement('div');
-            reviewCard.className = 'review-card flex-shrink-0 w-72 transform';
-            
-            // Truncate message if it's too long (150 characters)
-            const truncatedMessage = review.message.length > 150 
-                ? review.message.substring(0, 150).trim() + '...'
-                : review.message;
-
-            reviewCard.innerHTML = `
-                <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-lg h-full flex flex-col">
-                    <div class="flex items-start justify-between mb-2">
-                        <div>
-                            <h3 class="text-base font-semibold text-gray-900 dark:text-white">${review.reviewer}</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">${review.date_reviewed}</p>
-                        </div>
-                        <div class="flex text-yellow-400 text-sm">
-                            ${Array(review.star_rating).fill('★').join('')}
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">${truncatedMessage}</p>
-                </div>
-            `;
-            scrollWrapper.appendChild(reviewCard);
-        });
-    };
-
-    // Create two sets of review cards for seamless scrolling
-    createReviewCards();
-    createReviewCards();
-
-    container.appendChild(scrollWrapper);
-
-    // Set up the continuous scroll animation
-    let scrollPosition = 0;
-    const speed = 0.2; // Pixels per frame
-    const gap = 24; // Gap between cards (matches gap-6 class)
-    const cardWidth = 288 + gap; // w-72 (288px) + gap
-    const totalWidth = cardWidth * reviews.length;
-
-    let isMouseDown = false;
-    let startX;
-    let scrollLeft;
-    let animationFrameId;
-    let isPaused = false;
-
-    function animate() {
-        if (!isPaused) {
-            scrollPosition += speed;
-            
-            // Reset position when we've scrolled through one set of reviews
-            if (scrollPosition >= totalWidth) {
-                scrollPosition = 0;
+        const reviews = await response.json();
+        const visibleReviews = reviews.slice(0, 12);
+        const reviewCard = (review, duplicate = false) => `<article class="review-card"${duplicate ? ' aria-hidden="true"' : ''}><div class="review-stars">${'★'.repeat(review.star_rating)}</div><blockquote>“${escapeHtml(review.message.length > 180 ? `${review.message.slice(0, 177)}…` : review.message)}”</blockquote><div class="review-author"><strong>${escapeHtml(review.reviewer)}</strong><span>Etsy buyer · ${escapeHtml(review.date_reviewed)}</span></div></article>`;
+        document.getElementById('reviews-container').innerHTML = visibleReviews.map(review => reviewCard(review)).join('') + visibleReviews.map(review => reviewCard(review, true)).join('');
+        const reviewsWindow = document.getElementById('reviews-window');
+        const reviewsTrack = document.getElementById('reviews-container');
+        const firstDuplicate = reviewsTrack.querySelector('[aria-hidden="true"]');
+        const loopPoint = firstDuplicate.getBoundingClientRect().left - reviewsTrack.getBoundingClientRect().left;
+        let isPaused = false;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartScroll = 0;
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const animateReviews = () => {
+            if (!isPaused && !isDragging && !prefersReducedMotion) {
+                reviewsWindow.scrollLeft += .7;
+                if (reviewsWindow.scrollLeft >= loopPoint) reviewsWindow.scrollLeft -= loopPoint;
             }
-            
-            scrollWrapper.style.transform = `translateX(${-scrollPosition}px)`;
-        }
-        animationFrameId = requestAnimationFrame(animate);
-    }
-
-    // Start animation
-    animationFrameId = requestAnimationFrame(animate);
-
-    // Mouse and touch event handlers
-    function handleDragStart(e) {
-        isPaused = true;
-        isMouseDown = true;
-        startX = (e.pageX || e.touches[0].pageX) - container.offsetLeft;
-        scrollLeft = scrollPosition;
-        
-        // Change cursor style
-        scrollWrapper.style.cursor = 'grabbing';
-    }
-
-    function handleDragEnd() {
-        isMouseDown = false;
-        isPaused = false;
-        
-        // Restore cursor style
-        scrollWrapper.style.cursor = 'grab';
-    }
-
-    function handleDragMove(e) {
-        if (!isMouseDown) return;
-        e.preventDefault();
-        
-        const x = (e.pageX || e.touches[0].pageX) - container.offsetLeft;
-        const walk = (x - startX) * 1.5; // Multiply by 1.5 to make scrolling more responsive
-        scrollPosition = scrollLeft - walk;
-        
-        // Ensure scrollPosition stays within bounds
-        if (scrollPosition < 0) {
-            scrollPosition = totalWidth + (scrollPosition % totalWidth);
-        } else if (scrollPosition >= totalWidth) {
-            scrollPosition = scrollPosition % totalWidth;
-        }
-        
-        scrollWrapper.style.transform = `translateX(${-scrollPosition}px)`;
-    }
-
-    // Add mouse event listeners
-    container.addEventListener('mousedown', handleDragStart);
-    container.addEventListener('mouseleave', handleDragEnd);
-    container.addEventListener('mouseup', handleDragEnd);
-    container.addEventListener('mousemove', handleDragMove);
-
-    // Add touch event listeners
-    container.addEventListener('touchstart', handleDragStart);
-    container.addEventListener('touchend', handleDragEnd);
-    container.addEventListener('touchmove', handleDragMove);
-
-    // Update cursor style
-    scrollWrapper.style.cursor = 'grab';
-}
-
-// Reviews carousel state
-let currentReviewScroll = 0;
-let isAnimating = false;
-
-// Current slide index
-let currentSlide = 0;
-let slideInterval;
-
-// Function to initialize mobile menu
-function initializeMobileMenu() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
-}
-
-// Function to update hero content
-function updateHeroContent() {
-    const titleElement = document.getElementById('hero-title');
-    const descriptionElement = document.getElementById('hero-description');
-    const linkElement = document.getElementById('hero-link');
-    const image1 = document.getElementById('hero-image-1');
-    const image2 = document.getElementById('hero-image-2');
-    
-    if (currentSlide >= 0 && currentSlide < heroSlides.length) {
-        const slide = heroSlides[currentSlide];
-        
-        // Remove and re-add animation classes to restart animation
-        titleElement.classList.remove('hero-fade-in');
-        descriptionElement.classList.remove('hero-fade-in', 'hero-fade-in-delay');
-        
-        // Force a reflow to restart animations
-        void titleElement.offsetWidth;
-        void descriptionElement.offsetWidth;
-        
-        // Update content
-        titleElement.textContent = slide.title;
-        descriptionElement.textContent = slide.description;
-        linkElement.href = slide.link;
-        // Remove target="_blank" and rel attributes since we're opening in same tab
-        linkElement.removeAttribute('target');
-        linkElement.removeAttribute('rel');
-        
-        // Handle image crossfade
-        const currentImage = activeImageElement === 1 ? image1 : image2;
-        const nextImage = activeImageElement === 1 ? image2 : image1;
-        
-        // Set the new image on the hidden element
-        nextImage.style.backgroundImage = `url('${slide.image}')`;
-        
-        // Fade out current image and fade in next image
-        currentImage.style.opacity = '0';
-        nextImage.style.opacity = '1';
-        
-        // Toggle active image for next update
-        activeImageElement = activeImageElement === 1 ? 2 : 1;
-        
-        // Re-add animation classes
-        titleElement.classList.add('hero-fade-in');
-        descriptionElement.classList.add('hero-fade-in', 'hero-fade-in-delay');
-    }
-}
-
-let activeImageElement = 1; // Track which image element is currently active
-
-// Initialize hero images
-function initializeHeroImages() {
-    const image1 = document.getElementById('hero-image-1');
-    const image2 = document.getElementById('hero-image-2');
-    
-    if (heroSlides.length > 0) {
-        image1.style.backgroundImage = `url('${heroSlides[0].image}')`;
-        image1.style.opacity = '1';
-        image2.style.opacity = '0';
-    }
-}
-
-// Function to go to next slide
-function nextSlide() {
-    currentSlide = (currentSlide + 1) % heroSlides.length;
-    updateHeroContent();
-}
-
-// Function to go to previous slide
-function prevSlide() {
-    currentSlide = (currentSlide - 1 + heroSlides.length) % heroSlides.length;
-    updateHeroContent();
-}
-
-// Function to start hero carousel
-function startHeroCarousel() {
-    updateHeroContent(); // Show initial slide
-    
-    // Clear any existing interval
-    if (slideInterval) {
-        clearInterval(slideInterval);
-    }
-    
-    // Set up automatic slide transition every 5 seconds
-    slideInterval = setInterval(nextSlide, 5000);
-    
-    // Add navigation buttons event listeners
-    const prevButton = document.getElementById('prev-slide');
-    const nextButton = document.getElementById('next-slide');
-    
-    if (prevButton && nextButton) {
-        prevButton.addEventListener('click', () => {
-            prevSlide();
-            // Reset interval after manual navigation
-            clearInterval(slideInterval);
-            slideInterval = setInterval(nextSlide, 5000);
-        });
-        
-        nextButton.addEventListener('click', () => {
-            nextSlide();
-            // Reset interval after manual navigation
-            clearInterval(slideInterval);
-            slideInterval = setInterval(nextSlide, 5000);
-        });
-    }
-    
-    // Add smooth transition effect
-    const carousel = document.getElementById('hero-carousel');
-    if (carousel) {
-        carousel.style.transition = 'background-image 0.5s ease-in-out';
-    }
-}
-
-// Initialize theme
-function initializeTheme() {
-    // Set initial theme based on localStorage or system preference
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
-
-    // Function to toggle theme
-    function toggleTheme() {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.theme = 'light';
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.theme = 'dark';
-        }
-    }
-
-    // Add event listeners to theme toggle buttons if they exist
-    const themeToggle = document.getElementById('theme-toggle');
-    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-    
-    if (mobileThemeToggle) {
-        mobileThemeToggle.addEventListener('click', toggleTheme);
-    }
-}
-
-// Function to populate featured products
-function populateFeaturedProducts() {
-    const container = document.querySelector('#featured .grid');
-    if (!container) return;
-
-    featuredProducts.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors duration-200';
-        
-        productCard.innerHTML = `
-            <img src="${product.image}" alt="${product.title}" class="w-full h-48 object-cover">
-            <div class="p-6">
-                <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">${product.title}</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">${product.description}</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-lg font-bold text-primary-light dark:text-primary-dark">${product.price}</span>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(productCard);
-    });
-}
-
-// Function to fetch and parse CSV data
-async function fetchEtsyListings() {
-    try {
-        const response = await fetch('EtsyListings.csv');
-        const text = await response.text();
-        
-        // Parse CSV with proper handling of quoted fields containing newlines
-        const parseCSV = (str) => {
-            const arr = [];
-            let quote = false;  // true means we're inside a quoted field
-            let col = '';
-            let row = [];
-
-            for (let c = 0; c < str.length; c++) {
-                const cc = str[c];
-                const nc = str[c + 1]; // next character
-
-                if (cc === '"' && quote && nc === '"') { 
-                    // Quote inside quoted field
-                    col += cc;
-                    c++;
-                } else if (cc === '"') { 
-                    // Start/end quote
-                    quote = !quote;
-                } else if (cc === ',' && !quote) { 
-                    // End of column (not within quote)
-                    row.push(col.trim());
-                    col = '';
-                } else if (cc === '\n' && !quote) { 
-                    // End of line (not within quote)
-                    row.push(col.trim());
-                    if (row.length > 1) { // Skip empty rows
-                        arr.push(row);
-                    }
-                    row = [];
-                    col = '';
-                } else { 
-                    // Regular character - add to column
-                    col += cc;
-                }
-            }
-
-            // Handle last column
-            if (col.length > 0) {
-                row.push(col.trim());
-            }
-            if (row.length > 0) {
-                arr.push(row);
-            }
-
-            return arr;
         };
-
-        const rows = parseCSV(text);
-        const headers = rows[0].map(header => header.trim()); // Make sure to trim headers
-        const data = rows.slice(1);
-
-        // Convert to array of objects
-        return data.map(row => {
-            const item = {};
-            headers.forEach((header, index) => {
-                // Remove any remaining quotes and trim
-                const value = row[index] || '';
-                item[header] = value.replace(/^"|"$/g, '').trim();
-            });
-            return item;
+        reviewsWindow.addEventListener('mouseleave', () => { isPaused = false; isDragging = false; reviewsWindow.classList.remove('is-dragging'); });
+        reviewsWindow.addEventListener('pointerdown', event => {
+            if (event.pointerType !== 'mouse') return;
+            isDragging = true;
+            isPaused = true;
+            dragStartX = event.clientX;
+            dragStartScroll = reviewsWindow.scrollLeft;
+            reviewsWindow.classList.add('is-dragging');
+            reviewsWindow.setPointerCapture(event.pointerId);
         });
-    } catch (error) {
-        console.error('Error fetching Etsy listings:', error);
-        return [];
-    }
-}
-
-// Function to update hero section
-async function updateHeroSection() {
-    try {
-        const listings = await fetchEtsyListings();
-        const playmatListings = listings.filter(item => 
-            item.TITLE && 
-            item.TITLE.toLowerCase().includes('playmat') && 
-            item.IMAGE1
-        );
-
-        if (playmatListings.length > 0) {
-            // Update heroSlides with Etsy listings
-            heroSlides.length = 0; // Clear existing slides
-            playmatListings.forEach(product => {
-                const title = product.TITLE.replace('The Mana Market: ', '');
-                const description = product.DESCRIPTION.split('\n')[0];
-                
-                heroSlides.push({
-                    title: title,
-                    description: description,
-                    image: product.IMAGE1,
-                    link: `product-details.html?title=${encodeURIComponent(product.TITLE)}` // Changed to link to product details
-                });
-            });
-
-            // Start the carousel with the new slides
-            startHeroCarousel();
-        }
-    } catch (error) {
-        console.error('Error updating hero section:', error);
-    }
-}
-
-// Function to truncate text
-function truncateText(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength).trim() + '...';
-}
-
-// Function to get Etsy URL
-function getEtsySearchUrl(item) {
-    // If we have a direct URL in the CSV, use it
-    if (item.url || item.URL) {
-        return item.url || item.URL;
-    }
-    
-    // Fallback to shop search if no direct URL is available
-    const title = (item.title || item.TITLE || '').replace(/The\s+Mana\s+Market:?\s*/i, '');
-    const searchTitle = encodeURIComponent(title);
-    return `https://www.etsy.com/shop/themanamarket/search?search_query=${searchTitle}&utm_source=manamarket&utm_medium=shop_link&utm_campaign=share`;
-}
-
-// Function to update featured items
-async function updateFeaturedItems() {
-    try {
-        const listings = await fetchEtsyListings();
-        const featuredContainer = document.getElementById('featured-items');
-        
-        if (!featuredContainer) return;
-
-        // Get 6 featured items
-        const featuredItems = listings.slice(0, 6);
-        
-        let html = '';
-        featuredItems.forEach(item => {
-            const title = item.TITLE.replace('The Mana Market: ', '');
-            const description = truncateText(item.DESCRIPTION.split('\n')[0], 100);
-            const searchUrl = getEtsySearchUrl(item);
-            const detailsUrl = `product-details.html?title=${encodeURIComponent(item.TITLE)}`;
-            
-            html += `
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                    <div class="block h-full flex flex-col">
-                        <a href="${detailsUrl}" class="block">
-                            <img src="${item.IMAGE1}" alt="${title}" class="w-full h-64 object-cover">
-                            <div class="p-6 flex-1">
-                                <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">${title}</h3>
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">${description}</p>
-                            </div>
-                        </a>
-                        <div class="p-6 pt-0 mt-auto flex justify-between items-center">
-                            <span class="text-2xl font-bold text-primary-light dark:text-primary-dark">$${item.PRICE}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+        reviewsWindow.addEventListener('pointermove', event => {
+            if (!isDragging) return;
+            reviewsWindow.scrollLeft = dragStartScroll - (event.clientX - dragStartX);
         });
-        
-        featuredContainer.innerHTML = html;
-    } catch (error) {
-        console.error('Error updating featured items:', error);
-    }
+        const finishReviewDrag = event => {
+            if (!isDragging) return;
+            isDragging = false;
+            reviewsWindow.classList.remove('is-dragging');
+            if (reviewsWindow.hasPointerCapture(event.pointerId)) reviewsWindow.releasePointerCapture(event.pointerId);
+            window.setTimeout(() => { isPaused = false; }, 800);
+        };
+        reviewsWindow.addEventListener('pointerup', finishReviewDrag);
+        reviewsWindow.addEventListener('pointercancel', finishReviewDrag);
+        reviewsWindow.addEventListener('touchstart', () => { isPaused = true; }, {passive: true});
+        reviewsWindow.addEventListener('touchend', () => { window.setTimeout(() => { isPaused = false; }, 800); }, {passive: true});
+        window.setInterval(animateReviews, 50);
+    } catch (_) { document.getElementById('reviews-container').innerHTML = ''; }
 }
 
-// Function to render products
-function renderProducts() {
-    const productsGrid = document.getElementById('products-grid');
-    if (!productsGrid) return;
-    
-    let html = '';
-    filteredProducts.forEach(item => {
-        const title = item.TITLE.replace('The Mana Market: ', '');
-        const description = truncateText(item.DESCRIPTION.split('\n')[0], 100);
-        const searchUrl = getEtsySearchUrl(item);
-        const detailsUrl = `product-details.html?title=${encodeURIComponent(item.TITLE)}`;
-        
-        html += `
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                <div class="block h-full flex flex-col">
-                    <a href="${detailsUrl}" class="block">
-                        <img src="${item.IMAGE1}" alt="${title}" class="w-full h-64 object-cover">
-                        <div class="p-6 flex-1">
-                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">${title}</h3>
-                            <p class="text-gray-600 dark:text-gray-400 mb-4">${description}</p>
-                        </div>
-                    </a>
-                    <div class="p-6 pt-0 mt-auto flex justify-between items-center">
-                        <span class="text-2xl font-bold text-primary-light dark:text-primary-dark">$${item.PRICE}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    productsGrid.innerHTML = html || '<p class="text-gray-600 dark:text-gray-400 text-center col-span-full">No products found matching your criteria.</p>';
+function categoryCounts(products) {
+    return products.reduce((counts, item) => { const key = getCategory(item); counts[key] = (counts[key] || 0) + 1; return counts; }, {});
 }
 
-// Product filtering functions
-let allProducts = [];
-let filteredProducts = [];
-
-// Function to initialize product filters
-async function initializeProductFilters() {
+async function initializeCatalog() {
+    const grid = document.getElementById('products-grid');
     try {
-        // Get all products
-        allProducts = await fetchEtsyListings();
-        filteredProducts = [...allProducts];
-        
-        // Get unique categories
-        const categories = [...new Set(allProducts.map(item => {
-            const title = item.TITLE.toLowerCase();
-            if (title.includes('playmat')) return 'Playmats';
-            if (title.includes('deck box')) return 'Deck Boxes';
-            if (title.includes('shirt') || title.includes('hoodie')) return 'Apparel';
-            return 'Other';
-        }))].filter(Boolean);
-        
-        // Populate category filters
-        const categoryFilters = document.getElementById('category-filters');
-        if (categoryFilters) {
-            categories.forEach(category => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center';
-                div.innerHTML = `
-                    <input type="checkbox" id="category-${category.toLowerCase()}" value="${category}"
-                           class="rounded border-gray-300 dark:border-gray-600 text-primary-light dark:text-primary-dark focus:ring-primary-light dark:focus:ring-primary-dark">
-                    <label for="category-${category.toLowerCase()}" class="ml-2 text-gray-700 dark:text-gray-300">
-                        ${category}
-                    </label>
-                `;
-                categoryFilters.appendChild(div);
-            });
+        const products = await fetchProducts();
+        const categories = categoryCounts(products);
+        const params = new URLSearchParams(location.search);
+        const requestedCategory = params.get('category');
+        document.getElementById('search').value = params.get('search') || '';
+        document.getElementById('category-filters').innerHTML = Object.keys(categories).sort().map(category => `<label class="filter-option"><div><input type="checkbox" value="${escapeHtml(category)}" ${requestedCategory === category ? 'checked' : ''}><span>${escapeHtml(category)}</span></div><b>${categories[category]}</b></label>`).join('');
+        const applyFilters = () => {
+            const search = document.getElementById('search').value.toLowerCase().trim();
+            const selected = [...document.querySelectorAll('#category-filters input:checked')].map(input => input.value);
+            const min = Number(document.getElementById('min-price').value || 0);
+            const max = Number(document.getElementById('max-price').value || Infinity);
+            let filtered = products.filter(item => (!search || `${item.TITLE} ${item.TAGS}`.toLowerCase().includes(search)) && (!selected.length || selected.includes(getCategory(item))) && Number(item.PRICE) >= min && Number(item.PRICE) <= max);
+            const sort = document.getElementById('sort').value;
+            if (sort === 'price-asc') filtered.sort((a,b) => Number(a.PRICE)-Number(b.PRICE));
+            if (sort === 'price-desc') filtered.sort((a,b) => Number(b.PRICE)-Number(a.PRICE));
+            if (sort === 'name-asc') filtered.sort((a,b) => cleanTitle(a.TITLE).localeCompare(cleanTitle(b.TITLE)));
+            if (sort === 'name-desc') filtered.sort((a,b) => cleanTitle(b.TITLE).localeCompare(cleanTitle(a.TITLE)));
+            document.getElementById('product-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'product' : 'products'}`;
+            grid.innerHTML = filtered.length ? filtered.map(productCard).join('') : '<div class="empty-state"><h2>No gear found.</h2><p>Try clearing a filter or searching for something broader.</p></div>';
+        };
+        document.querySelectorAll('#filters input, #sort').forEach(control => control.addEventListener(control.type === 'search' || control.type === 'number' ? 'input' : 'change', applyFilters));
+        document.getElementById('clear-filters').addEventListener('click', () => { document.querySelectorAll('#filters input').forEach(input => { input.type === 'checkbox' ? input.checked = false : input.value = ''; }); document.getElementById('sort').value = 'featured'; applyFilters(); });
+        const toggle = document.getElementById('toggle-filters');
+        toggle.addEventListener('click', () => { const open = document.getElementById('filters').classList.toggle('open'); toggle.setAttribute('aria-expanded', String(open)); toggle.querySelector('span').textContent = open ? '−' : '＋'; });
+        applyFilters();
+    } catch (error) { grid.innerHTML = '<div class="empty-state"><h2>We could not load the collection.</h2><p>Please try again or visit our Etsy shop.</p></div>'; }
+}
+
+function descriptionMarkup(description = '') {
+    const featureLine = line => {
+        const text = line.replace(/^-\s*/, '').trim();
+        const colon = text.indexOf(':');
+        if (colon > 0 && colon < 80) return `<strong>${escapeHtml(text.slice(0, colon + 1))}</strong>${escapeHtml(text.slice(colon + 1))}`;
+        return escapeHtml(text);
+    };
+    return description.trim().split(/\n\s*\n/).filter(Boolean).map(block => {
+        const lines = block.split('\n').map(line => line.trim()).filter(Boolean);
+        const bulletLines = lines.filter(line => line.startsWith('-'));
+        if (bulletLines.length === lines.length) return `<ul>${bulletLines.map(line => `<li>${featureLine(line)}</li>`).join('')}</ul>`;
+        if (lines[0]?.endsWith(':') && bulletLines.length) {
+            return `<h3>${escapeHtml(lines[0].slice(0, -1))}</h3><ul>${bulletLines.map(line => `<li>${featureLine(line)}</li>`).join('')}</ul>`;
         }
-        
-        // Add event listeners
-        setupFilterEventListeners();
-        
-        // Initial render
-        renderProducts();
-    } catch (error) {
-        console.error('Error initializing product filters:', error);
-    }
+        if (lines.length === 1 && lines[0].endsWith(':')) return `<h3>${escapeHtml(lines[0].slice(0, -1))}</h3>`;
+        return `<p>${escapeHtml(lines.join(' '))}</p>`;
+    }).join('');
 }
 
-// Function to setup filter event listeners
-function setupFilterEventListeners() {
-    // Search
-    const searchInput = document.getElementById('search');
-    if (searchInput) {
-        searchInput.addEventListener('input', applyFilters);
-    }
-    
-    // Category filters
-    const categoryFilters = document.querySelectorAll('#category-filters input');
-    categoryFilters.forEach(filter => {
-        filter.addEventListener('change', applyFilters);
-    });
-    
-    // Price range
-    const minPrice = document.getElementById('min-price');
-    const maxPrice = document.getElementById('max-price');
-    if (minPrice && maxPrice) {
-        minPrice.addEventListener('input', applyFilters);
-        maxPrice.addEventListener('input', applyFilters);
-    }
-    
-    // Sort
-    const sortSelect = document.getElementById('sort');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', applyFilters);
-    }
-    
-    // Clear filters
-    const clearButton = document.getElementById('clear-filters');
-    if (clearButton) {
-        clearButton.addEventListener('click', clearFilters);
-    }
-}
-
-// Function to apply filters
-function applyFilters() {
-    // Get filter values
-    const searchTerm = document.getElementById('search')?.value.toLowerCase() || '';
-    const selectedCategories = Array.from(document.querySelectorAll('#category-filters input:checked')).map(input => input.value);
-    const minPrice = parseFloat(document.getElementById('min-price')?.value) || 0;
-    const maxPrice = parseFloat(document.getElementById('max-price')?.value) || Infinity;
-    const sortBy = document.getElementById('sort')?.value || 'featured';
-    
-    // Filter products
-    filteredProducts = allProducts.filter(product => {
-        const title = product.TITLE.replace('The Mana Market: ', '').toLowerCase();
-        const description = product.DESCRIPTION.toLowerCase();
-        const price = parseFloat(product.PRICE);
-        
-        // Get product category
-        let category = 'Other';
-        if (title.includes('playmat')) category = 'Playmats';
-        if (title.includes('deck box')) category = 'Deck Boxes';
-        if (title.includes('shirt') || title.includes('hoodie')) category = 'Apparel';
-        
-        // Apply filters
-        const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
-        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(category);
-        const matchesPrice = price >= minPrice && price <= maxPrice;
-        
-        return matchesSearch && matchesCategory && matchesPrice;
-    });
-    
-    // Sort products
-    switch (sortBy) {
-        case 'price-asc':
-            filteredProducts.sort((a, b) => parseFloat(a.PRICE) - parseFloat(b.PRICE));
-            break;
-        case 'price-desc':
-            filteredProducts.sort((a, b) => parseFloat(b.PRICE) - parseFloat(a.PRICE));
-            break;
-        case 'name-asc':
-            filteredProducts.sort((a, b) => a.TITLE.localeCompare(b.TITLE));
-            break;
-        case 'name-desc':
-            filteredProducts.sort((a, b) => b.TITLE.localeCompare(a.TITLE));
-            break;
-    }
-    
-    // Render filtered products
-    renderProducts();
-}
-
-// Function to clear all filters
-function clearFilters() {
-    // Reset search
-    const searchInput = document.getElementById('search');
-    if (searchInput) searchInput.value = '';
-    
-    // Reset categories
-    const categoryFilters = document.querySelectorAll('#category-filters input');
-    categoryFilters.forEach(filter => filter.checked = false);
-    
-    // Reset price range
-    const minPrice = document.getElementById('min-price');
-    const maxPrice = document.getElementById('max-price');
-    if (minPrice) minPrice.value = '';
-    if (maxPrice) maxPrice.value = '';
-    
-    // Reset sort
-    const sortSelect = document.getElementById('sort');
-    if (sortSelect) sortSelect.value = 'featured';
-    
-    // Reset filtered products
-    filteredProducts = [...allProducts];
-    
-    // Re-render products
-    renderProducts();
-}
-
-// Function to get URL parameters
-function getUrlParams() {
-    const params = new URLSearchParams(window.location.search);
-    return Object.fromEntries(params.entries());
-}
-
-// Function to display product details
-async function displayProductDetails() {
-    const productDetails = document.getElementById('product-details');
-    const productBreadcrumb = document.getElementById('product-breadcrumb');
-    if (!productDetails) return;
-
+async function initializeProductDetail() {
+    const container = document.getElementById('product-details');
     try {
-        const { title } = getUrlParams();
-        if (!title) {
-            productDetails.innerHTML = '<p class="text-center text-gray-900 dark:text-white">Product not found</p>';
-            if (productBreadcrumb) productBreadcrumb.textContent = 'Product Not Found';
-            return;
-        }
-
-        const listings = await fetchEtsyListings();
-        const product = listings.find(item => item.TITLE === title);
-        
-        if (!product) {
-            productDetails.innerHTML = '<p class="text-center text-gray-900 dark:text-white">Product not found</p>';
-            if (productBreadcrumb) productBreadcrumb.textContent = 'Product Not Found';
-            return;
-        }
-
-        // Update breadcrumb
-        const displayTitle = product.TITLE.replace('The Mana Market: ', '');
-        if (productBreadcrumb) {
-            productBreadcrumb.textContent = displayTitle;
-        }
-
-        // Get all available images
-        const images = [];
-        for (let i = 1; i <= 10; i++) {
-            const img = product[`IMAGE${i}`];
-            if (img) images.push(img);
-        }
-
-        // Get variations if they exist
-        const variations = [];
-        if (product['VARIATION 1 TYPE']) {
-            variations.push({
-                type: product['VARIATION 1 TYPE'],
-                name: product['VARIATION 1 NAME'],
-                values: product['VARIATION 1 VALUES']?.split(',') || []
-            });
-        }
-        if (product['VARIATION 2 TYPE']) {
-            variations.push({
-                type: product['VARIATION 2 TYPE'],
-                name: product['VARIATION 2 NAME'],
-                values: product['VARIATION 2 VALUES']?.split(',') || []
-            });
-        }
-
-        const searchUrl = getEtsySearchUrl(product);
-
-        let html = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Image Gallery -->
-                <div class="space-y-4">
-                    <div class="aspect-w-1 aspect-h-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                        <img src="${images[0]}" alt="${displayTitle}" class="w-full h-96 object-cover cursor-pointer product-image hover:scale-105 transition-transform duration-300" id="main-image">
-                    </div>
-                    <div class="grid grid-cols-5 gap-4">
-                        ${images.map((img, index) => `
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                                <img src="${img}" alt="${displayTitle} ${index + 1}" 
-                                    class="w-full h-20 object-cover cursor-pointer hover:opacity-75 transition-all duration-300 transform hover:scale-110 product-image">
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <!-- Product Info -->
-                <div class="space-y-8">
-                    <div class="space-y-4">
-                        <h1 class="text-4xl font-bold bg-gradient-to-br from-gray-900 to-primary-light dark:from-white dark:to-primary-dark bg-clip-text text-transparent leading-tight hover:scale-[1.01] transform transition-all duration-300">${displayTitle}</h1>
-                        <p class="text-3xl font-bold bg-gradient-to-r from-primary-light to-primary-dark bg-clip-text text-transparent">$${product.PRICE}</p>
-                    </div>
-
-                    <div class="prose dark:prose-invert max-w-none space-y-4">
-                        ${product.DESCRIPTION.split('\n').map(line => 
-                            `<p class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">${line}</p>`
-                        ).join('')}
-                    </div>
-
-                    ${variations.length > 0 ? `
-                        <div class="space-y-6">
-                            <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Options</h3>
-                            ${variations.map(variation => `
-                                <div class="space-y-3">
-                                    <h4 class="font-medium text-lg text-gray-900 dark:text-white">${variation.name}</h4>
-                                    <div class="flex flex-wrap gap-3">
-                                        ${variation.values.map(value => `
-                                            <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-                                                ${value.trim()}
-                                            </span>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-
-                    <div class="space-y-4">
-                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Tags</h3>
-                        <div class="flex flex-wrap gap-3">
-                            ${product.TAGS.split(',').map(tag => `
-                                <span class="group relative px-4 py-2 bg-gradient-to-br from-gray-100 to-white dark:from-gray-700 dark:to-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden">
-                                    <span class="relative z-10 inline-block group-hover:translate-x-1 transition-transform duration-300">${tag.trim().replace(/_/g, ' ')}</span>
-                                    <div class="absolute inset-0 bg-gradient-to-r from-primary-light/10 to-primary-dark/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-primary-light to-primary-dark group-hover:w-full transition-all duration-300"></div>
-                                </span>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <div class="pt-6">
-                        <a href="${searchUrl}" 
-                           class="group w-full flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#F1641E] to-[#FF8A3D] text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
-                            <i class="fab fa-etsy text-2xl mr-3 group-hover:scale-110 transition-transform duration-300"></i>
-                            <span class="text-lg font-semibold">View on Etsy</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        productDetails.innerHTML = html;
-
-        // Set up image modal functionality
-        const mainImage = document.getElementById('main-image');
-        const imageModal = document.getElementById('image-modal');
-        const modalImage = document.getElementById('modal-image');
-        const closeModal = document.getElementById('close-modal');
-        const productImages = document.querySelectorAll('.product-image');
-
-        if (imageModal && modalImage && closeModal) {
-            // Function to open modal
-            function openModal(imageSrc) {
-                modalImage.src = imageSrc;
-                imageModal.classList.remove('hidden');
-                imageModal.classList.add('flex');
-                document.body.style.overflow = 'hidden';
+        const products = await fetchProducts();
+        const titleParam = new URLSearchParams(location.search).get('title');
+        const item = products.find(product => product.TITLE === titleParam);
+        if (!item) throw new Error('Product not found');
+        const title = cleanTitle(item.TITLE);
+        const images = Array.from({length:10}, (_, index) => item[`IMAGE${index + 1}`]).filter(Boolean);
+        const variations = [1,2].map(index => ({name:item[`VARIATION ${index} NAME`], values:(item[`VARIATION ${index} VALUES`] || '').split(',').filter(Boolean)})).filter(variation => variation.name && variation.values.length);
+        const canonicalUrl = `https://themanamarket.com/product-details?title=${encodeURIComponent(item.TITLE)}`;
+        const metaDescription = item.DESCRIPTION.replace(/\s+/g, ' ').trim().slice(0, 155);
+        const encodedShareUrl = encodeURIComponent(canonicalUrl);
+        const encodedShareText = encodeURIComponent(`${title} | The Mana Market`);
+        document.title = `${title} | The Mana Market`;
+        document.querySelector('meta[name="description"]').content = metaDescription;
+        document.querySelector('meta[name="keywords"]').content = `${title}, ${getCategory(item)}, MTG accessories, Magic The Gathering, The Mana Market`;
+        document.querySelector('meta[property="og:title"]').content = `${title} | The Mana Market`;
+        document.querySelector('meta[property="og:description"]').content = metaDescription;
+        document.querySelector('meta[property="og:url"]').content = canonicalUrl;
+        document.querySelector('meta[property="og:image"]').content = images[0];
+        document.querySelector('link[rel="canonical"]').href = canonicalUrl;
+        document.getElementById('productSchema').textContent = JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: title,
+            description: item.DESCRIPTION,
+            image: images,
+            sku: item.SKU || undefined,
+            brand: {'@type': 'Brand', name: 'The Mana Market'},
+            offers: {
+                '@type': 'Offer',
+                url: etsyUrl(item),
+                priceCurrency: item.CURRENCY_CODE || 'USD',
+                price: Number(item.PRICE).toFixed(2),
+                availability: Number(item.QUANTITY) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
             }
-
-            // Function to close modal
-            function closeModalHandler() {
-                imageModal.classList.add('hidden');
-                imageModal.classList.remove('flex');
-                document.body.style.overflow = '';
-            }
-
-            // Add click event only to main image for modal
-            mainImage.addEventListener('click', () => openModal(mainImage.src));
-
-            // Close modal when clicking close button
-            closeModal.addEventListener('click', closeModalHandler);
-
-            // Close modal when clicking outside the image
-            imageModal.addEventListener('click', (e) => {
-                if (e.target === imageModal) {
-                    closeModalHandler();
-                }
-            });
-
-            // Close modal with escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !imageModal.classList.contains('hidden')) {
-                    closeModalHandler();
-                }
-            });
-
-            // Set up thumbnail functionality (only updates main image)
-            const thumbnails = Array.from(productImages).filter(img => img !== mainImage);
-            thumbnails.forEach(thumbnail => {
-                thumbnail.addEventListener('click', () => {
-                    mainImage.src = thumbnail.src;
-                    mainImage.alt = thumbnail.alt;
-                });
-            });
-
-            // Add zoom functionality to modal image
-            let isZoomed = false;
-            modalImage.addEventListener('click', () => {
-                if (isZoomed) {
-                    modalImage.style.transform = 'scale(1)';
-                    modalImage.style.cursor = 'zoom-in';
-                } else {
-                    modalImage.style.transform = 'scale(2)';
-                    modalImage.style.cursor = 'zoom-out';
-                }
-                isZoomed = !isZoomed;
-            });
-        }
-
-        // Display similar items
-        await displaySimilarItems(product);
-
-    } catch (error) {
-        console.error('Error displaying product details:', error);
-        productDetails.innerHTML = '<p class="text-center text-gray-900 dark:text-white">Error loading product details</p>';
-    }
-}
-
-// Function to display similar items
-async function displaySimilarItems(currentProduct) {
-    const similarItemsContainer = document.getElementById('similar-items');
-    if (!similarItemsContainer) return;
-
-    try {
-        const listings = await fetchEtsyListings();
-        
-        // Filter out the current product
-        const otherProducts = listings.filter(item => item.TITLE !== currentProduct.TITLE);
-        
-        // Get current product tags and category
-        const currentTags = currentProduct.TAGS.toLowerCase().split(',').map(tag => tag.trim());
-        const currentCategory = getProductCategory(currentProduct.TITLE);
-        
-        // Score each product based on similarity
-        const scoredProducts = otherProducts.map(product => {
-            const productTags = product.TAGS.toLowerCase().split(',').map(tag => tag.trim());
-            const productCategory = getProductCategory(product.TITLE);
-            
-            // Calculate similarity score
-            let score = 0;
-            // Category match is worth 5 points
-            if (productCategory === currentCategory) score += 5;
-            // Each matching tag is worth 1 point
-            score += productTags.filter(tag => currentTags.includes(tag)).length;
-            
-            return { product, score };
         });
-        
-        // Sort by score and take top 4
-        const similarProducts = scoredProducts
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 4)
-            .map(item => item.product);
-        
-        // Generate HTML for similar items
-        const html = similarProducts.map(product => {
-            const title = product.TITLE.replace('The Mana Market: ', '');
-            const detailsUrl = `product-details.html?title=${encodeURIComponent(product.TITLE)}`;
-            
-            return `
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                    <a href="${detailsUrl}" class="block">
-                        <img src="${product.IMAGE1}" alt="${title}" class="w-full h-48 object-cover">
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">${title}</h3>
-                            <span class="text-lg font-bold text-primary-light dark:text-primary-dark">$${product.PRICE}</span>
-                        </div>
-                    </a>
+        document.getElementById('product-breadcrumb').textContent = title;
+        container.innerHTML = `
+            <div class="detail-layout">
+                <div class="detail-gallery">
+                    <div class="thumb-list">
+                        ${images.map((image,index) => `<button class="thumb-button ${index === 0 ? 'active' : ''}" data-image="${escapeHtml(image)}" aria-label="View product image ${index + 1}"><img src="${escapeHtml(image)}" alt=""></button>`).join('')}
+                    </div>
+                    <div class="main-image-wrap">
+                        <img id="main-product-image" src="${escapeHtml(images[0])}" alt="${escapeHtml(title)}">
+                    </div>
                 </div>
-            `;
-        }).join('');
-        
-        similarItemsContainer.innerHTML = html;
-    } catch (error) {
-        console.error('Error displaying similar items:', error);
-        similarItemsContainer.innerHTML = '<p class="text-center text-gray-600 dark:text-gray-400">Unable to load similar items</p>';
-    }
+                <div class="detail-info">
+                    <span class="detail-kicker">${getCategory(item)}</span>
+                    <h1>${escapeHtml(title)}</h1>
+                    <div class="detail-price">$${Number(item.PRICE).toFixed(2)}</div>
+                    <div class="product-share">
+                        <strong>Share:</strong>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedShareUrl}" target="_blank" rel="noopener" aria-label="Share this product on Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h3V4h-3c-3 0-5 2-5 5v2H6v4h3v7h4v-7h3l1-4h-4V9c0-.7.3-1 1-1Z"/></svg></a>
+                        <a href="https://twitter.com/intent/tweet?url=${encodedShareUrl}&text=${encodedShareText}" target="_blank" rel="noopener" aria-label="Share this product on X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 4 14 16M19 4 5 20"/></svg></a>
+                        <button id="copy-product-link" type="button" aria-label="Copy product link"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+                        <span id="share-status" aria-live="polite"></span>
+                    </div>
+                    <div class="detail-description">${descriptionMarkup(item.DESCRIPTION)}</div>
+                    ${variations.map((variation,index) => `<div class="variation"><label for="variation-${index}">${escapeHtml(variation.name)}</label><select id="variation-${index}">${variation.values.map(value => `<option>${escapeHtml(value)}</option>`).join('')}</select></div>`).join('')}
+                    <a class="button etsy-button" href="${escapeHtml(etsyUrl(item))}" target="_blank" rel="noopener">View and purchase on Etsy ↗</a>
+                </div>
+            </div>`;
+        const mainImage = document.getElementById('main-product-image');
+        const thumbnailButtons = Array.from(document.querySelectorAll('.thumb-button'));
+        thumbnailButtons.forEach(button => button.addEventListener('click', () => {
+            mainImage.src = button.dataset.image;
+            thumbnailButtons.forEach(thumb => thumb.classList.remove('active'));
+            button.classList.add('active');
+            button.scrollIntoView({
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+        }));
+        const modal = document.getElementById('image-modal');
+        document.querySelector('.main-image-wrap').addEventListener('click', () => { document.getElementById('modal-image').src = mainImage.src; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); });
+        const closeModal = () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); };
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+        document.getElementById('copy-product-link').addEventListener('click', async () => {
+            const status = document.getElementById('share-status');
+            try {
+                await navigator.clipboard.writeText(canonicalUrl);
+                status.textContent = 'Link copied';
+            } catch (_) {
+                status.textContent = 'Unable to copy';
+            }
+            window.setTimeout(() => { status.textContent = ''; }, 2000);
+        });
+        const similar = products.filter(product => product !== item).sort((a,b) => Number(getCategory(b) === getCategory(item)) - Number(getCategory(a) === getCategory(item))).slice(0,4);
+        document.getElementById('similar-items').innerHTML = similar.map(product => productCard(product)).join('');
+    } catch (error) { container.innerHTML = '<div class="empty-state"><h2>That item slipped out of the binder.</h2><p><a class="text-link" href="products.html">Return to the collection →</a></p></div>'; document.querySelector('.similar-section').hidden = true; }
 }
 
-// Helper function to get product category
-function getProductCategory(title) {
-    title = title.toLowerCase();
-    if (title.includes('playmat')) return 'Playmats';
-    if (title.includes('deck box')) return 'Deck Boxes';
-    if (title.includes('shirt') || title.includes('hoodie')) return 'Apparel';
-    return 'Other';
-}
-
-// Function to create menu bar for consistency across pages
-function createMenuBar() {
-    const nav = document.createElement('nav');
-    nav.className = 'fixed w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50 transition-colors duration-200';
-    
-    nav.innerHTML = `
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div id="home-link" class="text-2xl font-bold text-gradient cursor-pointer">The Mana Market</div>
-            
-            <!-- Desktop Navigation -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="index.html" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Home</a>
-                <a href="products.html" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Products</a>
-                <a href="index.html#testimonials" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Reviews</a>
-                <a href="index.html#about" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">About</a>
-                <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
-                    <i class="fas fa-moon dark:hidden"></i>
-                    <i class="fas fa-sun hidden dark:inline"></i>
-                </button>
-            </div>
-            
-            <!-- Mobile Menu Button -->
-            <div class="md:hidden flex items-center">
-                <button id="mobile-theme-toggle" class="mr-4 text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
-                    <i class="fas fa-moon dark:hidden"></i>
-                    <i class="fas fa-sun hidden dark:inline"></i>
-                </button>
-                <button id="mobile-menu-button" class="text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-gray-800 transition-colors duration-200">
-            <div class="container mx-auto px-4 py-4 space-y-4">
-                <a href="index.html" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Home</a>
-                <a href="products.html" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Products</a>
-                <a href="index.html#testimonials" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">Reviews</a>
-                <a href="index.html#about" class="block text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition">About</a>
-            </div>
-        </div>
-    `;
-    
-    return nav;
-}
-
-// Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Insert navigation bar
-    const menuContainer = document.getElementById('menu-container');
-    const nav = createMenuBar();
-    
-    if (menuContainer) {
-        // If menu-container exists, insert into it
-        menuContainer.appendChild(nav);
-    } else {
-        // Otherwise, insert at the start of body
-        document.body.insertBefore(nav, document.body.firstChild);
-    }
-    
-    initializeTheme();
-    initializeMobileMenu();
-
-    // Add event listener to "The Mana Market" text
-    const homeLink = document.getElementById('home-link');
-    if (homeLink) {
-        homeLink.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-    }
-
-    // Check if we're on the products page
-    if (window.location.pathname.includes('products.html')) {
-        initializeProductFilters();
-    } else if (window.location.pathname.includes('product-details.html')) {
-        displayProductDetails();
-    } else {
-        // Homepage initialization
-        initializeHeroImages();
-        Promise.all([
-            updateHeroSection(),
-            updateFeaturedItems(),
-            fetchReviews()
-        ]).then(() => {
-            startHeroCarousel();
-        });
-    }
+    initializeChrome();
+    if (document.getElementById('featured-items')) initializeHome();
+    if (document.getElementById('products-grid')) initializeCatalog();
+    if (document.getElementById('product-details')) initializeProductDetail();
 });
