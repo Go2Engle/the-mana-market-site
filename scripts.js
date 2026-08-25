@@ -51,14 +51,14 @@ function createHeader() {
             <div class="nav-row shell">
                 <a class="brand" href="index.html" aria-label="The Mana Market home"><span class="brand-mark">M</span><span>The Mana Market</span></a>
                 <nav class="desktop-nav" aria-label="Main navigation"><a class="${shopActive ? '' : 'active'}" href="index.html">Home</a><a class="${shopActive ? 'active' : ''}" href="products.html">Products</a><a href="index.html#testimonials">Reviews</a></nav>
-                <div class="nav-actions"><a class="shop-button" href="${STORE_URL}" target="_blank" rel="noopener">Shop on Etsy ↗</a><button id="menu-toggle" class="menu-button" aria-label="Open menu" aria-expanded="false">☰</button></div>
+                <div class="nav-actions"><a class="shop-button" href="${STORE_URL}" target="_blank" rel="noopener">Shop on Etsy</a><button id="menu-toggle" class="menu-button" aria-label="Open menu" aria-expanded="false">☰</button></div>
             </div>
-            <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation"><a href="index.html">Home</a><a href="products.html">Products</a><a href="index.html#testimonials">Reviews</a><a href="${STORE_URL}" target="_blank" rel="noopener">Shop on Etsy ↗</a></nav>
+            <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile navigation"><a href="index.html">Home</a><a href="products.html">Products</a><a href="index.html#testimonials">Reviews</a><a href="${STORE_URL}" target="_blank" rel="noopener">Shop on Etsy</a></nav>
         </header>`;
 }
 
 function createFooter() {
-    return `<footer class="site-footer"><div class="shell"><div class="footer-main"><a class="brand" href="index.html"><span class="brand-mark">M</span><span>The Mana Market</span></a><nav class="footer-links" aria-label="Footer navigation"><a href="products.html">Products</a><a href="index.html#testimonials">Reviews</a><a href="${STORE_URL}" target="_blank" rel="noopener">Etsy shop ↗</a></nav></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} The Mana Market</span><span>TCG accessories sold through Etsy</span></div></div></footer>`;
+    return `<footer class="site-footer"><div class="shell"><div class="footer-main"><a class="brand" href="index.html"><span class="brand-mark">M</span><span>The Mana Market</span></a><nav class="footer-links" aria-label="Footer navigation"><a href="products.html">Products</a><a href="index.html#testimonials">Reviews</a><a href="${STORE_URL}" target="_blank" rel="noopener">Etsy shop</a></nav><div class="footer-contact" aria-label="Contact information"><a href="mailto:chris@themanamarket.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg><span>chris@themanamarket.com</span></a><a href="https://www.instagram.com/themanamarketoffical/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r=".75"></circle></svg><span>themanamarketoffical</span></a></div></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} The Mana Market</span><span>TCG accessories sold through Etsy</span></div></div></footer>`;
 }
 
 function initializeChrome() {
@@ -259,7 +259,7 @@ async function initializeProductDetail() {
                     </div>
                     <div class="detail-description">${descriptionMarkup(item.DESCRIPTION)}</div>
                     ${variations.map((variation,index) => `<div class="variation"><label for="variation-${index}">${escapeHtml(variation.name)}</label><select id="variation-${index}">${variation.values.map(value => `<option>${escapeHtml(value)}</option>`).join('')}</select></div>`).join('')}
-                    <a class="button etsy-button" href="${escapeHtml(etsyUrl(item))}" target="_blank" rel="noopener">View and purchase on Etsy ↗</a>
+                    <a class="button etsy-button" href="${escapeHtml(etsyUrl(item))}" target="_blank" rel="noopener">View and purchase on Etsy</a>
                 </div>
             </div>`;
         const mainImage = document.getElementById('main-product-image');
@@ -291,7 +291,7 @@ async function initializeProductDetail() {
         });
         const similar = products.filter(product => product !== item).sort((a,b) => Number(getCategory(b) === getCategory(item)) - Number(getCategory(a) === getCategory(item))).slice(0,4);
         document.getElementById('similar-items').innerHTML = similar.map(product => productCard(product)).join('');
-    } catch (error) { container.innerHTML = '<div class="empty-state"><h2>That item slipped out of the binder.</h2><p><a class="text-link" href="products.html">Return to the collection →</a></p></div>'; document.querySelector('.similar-section').hidden = true; }
+    } catch (error) { container.innerHTML = '<div class="empty-state"><h2>That item slipped out of the binder.</h2><p><a class="text-link" href="products.html">Return to the collection</a></p></div>'; document.querySelector('.similar-section').hidden = true; }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

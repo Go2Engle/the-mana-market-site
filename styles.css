@@ -94,6 +94,10 @@ h1, h2, h3 { font-family: 'Manrope', sans-serif; letter-spacing: -.04em; }
 .footer-main { display: flex; align-items: center; justify-content: space-between; gap: 35px; }
 .site-footer .brand-mark { background: var(--accent); color: var(--white); }
 .footer-links { display: flex; gap: 28px; color: #bdc2bb; font-size: 13px; }
+.footer-contact { display: flex; flex-direction: column; gap: 8px; color: #bdc2bb; font-size: 13px; }
+.footer-contact a { display: inline-flex; align-items: center; gap: 8px; }
+.footer-contact svg { width: 16px; height: 16px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.footer-contact a:hover { color: var(--white); }
 .footer-bottom { display: flex; justify-content: space-between; margin-top: 35px; padding-top: 20px; border-top: 1px solid #2c302b; color: #777c75; font-size: 11px; }
 
 .catalog-hero { padding-block: 52px; background: var(--ink); color: var(--white); border-bottom: 5px solid var(--accent); }
@@ -232,6 +236,7 @@ h1, h2, h3 { font-family: 'Manrope', sans-serif; letter-spacing: -.04em; }
     .about-grid h2 { font-size: 34px; }
     .footer-main { display: block; }
     .footer-links { margin-top: 25px; flex-wrap: wrap; gap: 15px 24px; }
+    .footer-contact { margin-top: 25px; }
     .footer-bottom { display: block; }
     .footer-bottom span { display: block; margin-top: 5px; }
     .catalog-hero { padding-block: 42px; }
