@@ -188,11 +188,11 @@ h1, h2, h3 { font-family: 'Manrope', sans-serif; letter-spacing: -.04em; }
 }
 
 @media (max-width: 900px) {
-    .site-header { background: var(--paper); }
+    .site-header { background: var(--paper); isolation: isolate; backdrop-filter: none; }
     .desktop-nav { display: none; }
     .nav-row { grid-template-columns: 1fr auto; }
     .menu-button { display: block; }
-    .mobile-menu { position: fixed; inset: 74px 0 0; z-index: 39; padding: 28px 24px; background: var(--paper); }
+    .mobile-menu { position: fixed; inset: 74px 0 0; z-index: 1000; padding: 28px 24px; background-color: #fff; box-shadow: 0 12px 24px rgba(11,13,16,.08); }
     .mobile-menu.open { display: block; }
     .mobile-menu a { display: block; padding: 15px 0; border-bottom: 1px solid var(--line); font-family: 'Manrope', sans-serif; font-size: 21px; font-weight: 700; }
     .hero { grid-template-columns: 1fr; min-height: auto; gap: 40px; }
